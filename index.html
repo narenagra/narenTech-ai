@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>narenTech-ai | Educational Platform & AI Hub</title>
+  <meta name="description" content="Explore interactive tutorials, simulated uploads, study notes, and hands-on AI learning simulations by narenTech-ai.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Dynamic Interactive Background -->
+  <div class="bg-grid"></div>
+  <div class="bg-radial-glow"></div>
+
+  <!-- Navigation Header -->
+  <header>
+    <a href="#" class="logo" id="brand-logo">
+      narenTech<span class="tech"></span><span class="ai">AI</span>
+    </a>
+    
+    <nav class="nav-links">
+      <button class="nav-item active" data-tab="dashboard-tab">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-tab="videos-tab">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"></path></svg>
+        Video Hub
+      </button>
+      <button class="nav-item" data-tab="notes-tab">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        Study Notes
+      </button>
+      <button class="nav-item" data-tab="sandbox-tab">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"></circle><circle cx="5" cy="19" r="3"></circle><circle cx="19" cy="19" r="3"></circle><line x1="5" y1="16" x2="19" y2="16"></line><line x1="5" y1="16" x2="12" y2="8"></line><line x1="19" y1="16" x2="12" y2="8"></line></svg>
+        AI Simulator
+      </button>
+    </nav>
+
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <button class="youtube-badge" id="btn-header-chat" style="cursor: pointer; border: none; font-family: inherit;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+        AI Chatbot
+      </button>
+      <button class="youtube-badge" id="btn-admin-portal" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-secondary); cursor: pointer; border-radius: 9999px; padding: 0.5rem; display: flex; align-items: center; justify-content: center;" title="Admin Portal">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Page Content Shell -->
+  <main>
+
+    <!-- TAB 1: DASHBOARD -->
+    <section id="dashboard-tab" class="tab-content active">
+      <div class="hero">
+        <div class="hero-text-content">
+          <span class="hero-subtitle">Next-Gen Education by narenTech-ai</span>
+          <h1 class="hero-title">
+            <span>Demystifying</span>
+            <span class="gradient-text">Artificial Intelligence</span>
+          </h1>
+          <p class="hero-desc">
+            Welcome to narenTech-ai, your comprehensive learning hub for Deep Learning, Machine Learning, and Computer Vision. Dive into step-by-step video courses, read production-grade documentation, and train actual neural networks interactively right inside your browser.
+          </p>
+          <div class="hero-buttons">
+            <button class="btn btn-primary" onclick="switchTab('sandbox-tab')">
+              Launch AI Simulator
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+            <button class="btn btn-secondary" onclick="switchTab('videos-tab')">
+              Browse Videos
+            </button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-glow-sphere"></div>
+          <!-- Premium 3D Glass Card showing Simulated Channel Logo -->
+          <div class="glass-card purple-glow" style="width: 320px; padding: 2rem; text-align: center; border-radius: 24px;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); border-radius: 20px; margin: 0 auto 1.5rem auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px var(--accent-purple-glow);">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+            </div>
+            <h3 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">narenTech-ai</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">YT Educational Hub</p>
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem; display: flex; justify-content: space-around;">
+              <div>
+                <p style="font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan);">125k+</p>
+                <p style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Students</p>
+              </div>
+              <div style="border-left: 1px solid var(--border-color); height: 35px;"></div>
+              <div>
+                <p style="font-size: 1.1rem; font-weight: 700; color: var(--accent-purple);">450+</p>
+                <p style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Videos</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Channel Analytics Panel -->
+      <div class="dashboard-summary">
+        <div class="glass-card purple-glow stat-item">
+          <span class="stat-label">Subscribers</span>
+          <span class="stat-val gradient-purple">125,840</span>
+          <span class="stat-desc">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+            +1.2% this week
+          </span>
+        </div>
+        <div class="glass-card cyan-glow stat-item">
+          <span class="stat-label">Total Views</span>
+          <span class="stat-val gradient-cyan">2,482,900</span>
+          <span class="stat-desc">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+            +42.3k today
+          </span>
+        </div>
+        <div class="glass-card stat-item">
+          <span class="stat-label">Simulations Run</span>
+          <span class="stat-val">32,845</span>
+          <span class="stat-desc" style="color: var(--accent-cyan);">
+            Active Learners
+          </span>
+        </div>
+        <div class="glass-card stat-item">
+          <span class="stat-label">Notes Catalog</span>
+          <span class="stat-val">84 PDFs</span>
+          <span class="stat-desc">
+            Updated today
+          </span>
+        </div>
+      </div>
+
+      <!-- Highlight Video Section -->
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>Trending Lessons</h2>
+          <p>Hand-picked classes to master complex concepts in minutes.</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="switchTab('videos-tab')">View All</button>
+      </div>
+
+      <div class="video-grid" id="trending-video-grid">
+        <!-- Rendered dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- TAB 2: VIDEOS HUB -->
+    <section id="videos-tab" class="tab-content">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>Video Hub & Portal</h2>
+          <p>Upload new educational clips to simulate deployment and test local courses.</p>
+        </div>
+      </div>
+
+      <div class="upload-wrapper" id="video-hub-wrapper">
+        <!-- Left Panel: Uploader Form -->
+        <div class="glass-card purple-glow admin-only">
+          <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-purple)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            Simulate Video Upload
+          </h3>
+          <div class="upload-form">
+            <div class="form-group">
+              <label for="video-title">Video Title</label>
+              <input type="text" id="video-title" class="form-control" placeholder="e.g., Backpropagation Explained Intuitive">
+            </div>
+            <div class="form-group">
+              <label for="video-desc">Description</label>
+              <textarea id="video-desc" class="form-control" placeholder="Describe the topics and parameters detailed in this video tutorial..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="video-duration-input">Duration (mm:ss)</label>
+              <input type="text" id="video-duration-input" class="form-control" placeholder="05:30" value="06:45">
+            </div>
+            
+            <div class="form-group">
+              <label>Select Video File</label>
+              <div class="dropzone" id="video-dropzone">
+                <input type="file" id="video-file-input" accept="video/*" style="display: none;">
+                <span class="dropzone-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"></path></svg>
+                </span>
+                <p style="font-weight: 500; font-size: 0.95rem;">Drag & drop video file or click to browse</p>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Supports MP4, WebM, AVI (simulated processing)</p>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="upload-progress-container" id="video-progress-container">
+              <div class="progress-header">
+                <span class="progress-title" id="video-progress-title">Uploading video...</span>
+                <span class="progress-percent" id="video-progress-percent">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="video-progress-fill"></div>
+              </div>
+              <span class="progress-status" id="video-progress-status">Speed: 45 MB/s</span>
+            </div>
+
+            <button class="btn btn-primary" id="start-upload-btn" style="width: 100%;">
+              Process & Add Video
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Panel: Lesson Catalog -->
+        <div class="glass-card" style="min-height: 100%;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.2rem; font-weight: 700;">Tutorial Collection</h3>
+            <div class="search-bar-wrap" style="width: 220px;">
+              <input type="text" id="video-search" class="form-control btn-sm" placeholder="Search courses..." style="width: 100%; border-radius: 6px;">
+            </div>
+          </div>
+          
+          <div class="video-grid" id="full-video-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: STUDY NOTES -->
+    <section id="notes-tab" class="tab-content">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>Education Notes & Docs</h2>
+          <p>Read standard text notes or drop in markdown/text files to parse them on-the-fly.</p>
+        </div>
+      </div>
+
+      <div class="notes-container">
+        <!-- Sidebar: Upload and File List -->
+        <div class="notes-sidebar">
+          <div class="glass-card cyan-glow admin-only">
+            <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              Upload Text/MD Note
+            </h3>
+            
+            <div class="dropzone" id="notes-dropzone" style="padding: 1.5rem 1rem;">
+              <input type="file" id="notes-file-input" accept=".txt,.md" style="display: none;">
+              <span class="dropzone-icon" style="font-size: 2rem;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              </span>
+              <p style="font-size: 0.8rem; font-weight: 500;">Drop TXT/MD note file</p>
+            </div>
+            
+            <!-- Notes Progress -->
+            <div class="upload-progress-container" id="notes-progress-container" style="margin-top: 1rem;">
+              <div class="progress-header">
+                <span class="progress-title" style="font-size: 0.75rem;">Parsing note...</span>
+                <span class="progress-percent" id="notes-progress-percent" style="font-size: 0.75rem;">0%</span>
+              </div>
+              <div class="progress-bar-bg" style="height: 4px;">
+                <div class="progress-bar-fill" id="notes-progress-fill"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card" style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+            <div class="search-bar-wrap">
+              <span class="search-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" id="notes-search" class="form-control" placeholder="Search notes..." style="padding-left: 2.2rem; font-size: 0.85rem; padding-top: 0.5rem; padding-bottom: 0.5rem;">
+            </div>
+            <div class="notes-list" id="notes-list">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Full Screen formatted Notes Reader -->
+        <div class="glass-card notes-content-area purple-glow">
+          <div class="notes-reader-header">
+            <div class="notes-title-wrap">
+              <h3 id="reader-title">Introduction to Deep Learning</h3>
+              <div class="notes-meta-info" id="reader-meta">Written by narenTech-ai • Last updated today</div>
+            </div>
+            <div class="reader-settings">
+              <button class="btn btn-secondary btn-sm" id="btn-font-dec" title="Decrease font size" style="padding: 0.25rem 0.5rem;">A-</button>
+              <button class="btn btn-secondary btn-sm" id="btn-font-inc" title="Increase font size" style="padding: 0.25rem 0.5rem;">A+</button>
+              <button class="btn btn-accent btn-sm" id="btn-copy-note" style="padding: 0.25rem 0.65rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Copy Raw
+              </button>
+            </div>
+          </div>
+          
+          <div class="reader-body" id="reader-body">
+            <!-- Dynamic note display container -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: INTERACTIVE AI SIMULATION -->
+    <section id="sandbox-tab" class="tab-content">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>Neural Sandbox</h2>
+          <p>Configure features, structure parameters, and visual training boundaries in real-time.</p>
+        </div>
+      </div>
+
+      <div class="simulator-layout">
+        <!-- 1. Left Panel: parameters control -->
+        <div class="glass-card simulator-controls purple-glow">
+          <div class="simulator-group">
+            <h4>1. Choose Dataset</h4>
+            <div class="dataset-selector">
+              <button class="dataset-btn active" data-dataset="circle" title="Circular classification boundary">
+                <div style="width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid var(--accent-cyan); box-sizing: border-box;"></div>
+                Circle
+              </button>
+              <button class="dataset-btn" data-dataset="xor" title="Non-linear Exclusive OR pattern">
+                <div style="position: relative; width: 14px; height: 14px;">
+                  <div style="position: absolute; top:0; left:0; width:6px; height:6px; background:var(--accent-purple); border-radius:1px;"></div>
+                  <div style="position: absolute; bottom:0; right:0; width:6px; height:6px; background:var(--accent-purple); border-radius:1px;"></div>
+                  <div style="position: absolute; top:0; right:0; width:6px; height:6px; background:var(--accent-cyan); border-radius:50%;"></div>
+                  <div style="position: absolute; bottom:0; left:0; width:6px; height:6px; background:var(--accent-cyan); border-radius:50%;"></div>
+                </div>
+                XOR
+              </button>
+              <button class="dataset-btn" data-dataset="linear" title="Linearly separable data pattern">
+                <div style="width: 16px; height: 16px; position: relative;">
+                  <div style="position: absolute; width: 100%; height: 2px; background: var(--text-muted); top: 50%; transform: rotate(-45deg);"></div>
+                  <div style="position: absolute; top: 1px; left: 1px; width: 5px; height: 5px; background: var(--accent-cyan); border-radius: 50%;"></div>
+                  <div style="position: absolute; bottom: 1px; right: 1px; width: 5px; height: 5px; background: var(--accent-purple); border-radius: 1px;"></div>
+                </div>
+                Linear
+              </button>
+            </div>
+          </div>
+
+          <div class="simulator-group">
+            <h4>2. Architecture Config</h4>
+            <div class="param-slider-wrap">
+              <div class="slider-label">
+                <span>Hidden Layers</span>
+                <span id="label-hidden-layers" style="font-weight:700; color:var(--accent-purple);">2</span>
+              </div>
+              <input type="range" id="slider-hidden-layers" min="1" max="4" value="2" step="1" style="width: 100%;">
+            </div>
+            
+            <div id="neurons-controllers-container" style="display: flex; flex-direction: column; gap: 0.65rem; margin-top: 0.25rem;">
+              <!-- Dynamic nodes controllers based on number of layers -->
+            </div>
+          </div>
+
+          <div class="simulator-group">
+            <h4>3. Hyperparameters</h4>
+            <div class="param-grid">
+              <div class="param-slider-wrap">
+                <span class="slider-label" style="font-size: 0.75rem;">Learning Rate</span>
+                <select id="select-lr" class="form-control btn-sm" style="background: rgba(255,255,255,0.02); border-radius: 6px;">
+                  <option value="0.01">0.01</option>
+                  <option value="0.03" selected>0.03</option>
+                  <option value="0.1">0.1</option>
+                  <option value="0.3">0.3</option>
+                </select>
+              </div>
+              <div class="param-slider-wrap">
+                <span class="slider-label" style="font-size: 0.75rem;">Activation</span>
+                <select id="select-activation" class="form-control btn-sm" style="background: rgba(255,255,255,0.02); border-radius: 6px;">
+                  <option value="relu">ReLU</option>
+                  <option value="sigmoid">Sigmoid</option>
+                  <option value="tanh" selected>Tanh</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Center Panel: network drawing visualizer -->
+        <div class="glass-card network-graph-container">
+          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between;">
+            <span>Weights Visualizer</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">Thicker lines = higher weights</span>
+          </h3>
+          <div class="network-canvas-wrap">
+            <svg id="networkSvg">
+              <!-- Synapses/Connections and Nodes are rendered dynamically -->
+            </svg>
+          </div>
+        </div>
+
+        <!-- 3. Right Panel: training boundary and plots -->
+        <div class="glass-card sim-output-container cyan-glow">
+          <h3 style="font-size: 1.1rem; font-weight: 700;">Decision Boundary</h3>
+          
+          <div class="sim-canvas-wrap">
+            <canvas id="boundaryCanvas" width="200" height="200"></canvas>
+          </div>
+
+          <div class="sim-metrics">
+            <div class="metric-card">
+              <div class="label">Epoch</div>
+              <div class="value" id="metric-epoch">0000</div>
+            </div>
+            <div class="metric-card">
+              <div class="label">Train Loss</div>
+              <div class="value" id="metric-loss">0.000</div>
+            </div>
+            <div class="metric-card">
+              <div class="label">Accuracy</div>
+              <div class="value" id="metric-accuracy">0.0%</div>
+            </div>
+          </div>
+
+          <div class="sim-control-panel">
+            <button class="btn btn-primary" id="btn-train-toggle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              Train Model
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-train-step" title="Run single epoch">
+              Step
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-train-reset" title="Reinitialize random weights">
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Video Player Custom Overlay Modal -->
+  <div class="video-player-modal" id="player-modal">
+    <div class="video-player-container">
+      <div class="player-header">
+        <h3 id="modal-video-title">Video Lesson Playback</h3>
+        <button class="close-player" id="modal-video-close">&times;</button>
+      </div>
+      <div class="player-body">
+        <video id="main-player" controls preload="metadata"></video>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social Community Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3 class="logo" style="margin-bottom: 1.25rem;">
+          narenTech<span class="tech"></span><span class="ai">AI</span>
+        </h3>
+        <p style="margin-bottom: 1.5rem;">
+          Deploying world-class AI and software engineering education. Follow narenTech-ai on YouTube and connect via our active community channels to query concepts, download slides, and get real-time learning guidance.
+        </p>
+        <div style="font-size: 0.9rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.4rem;">
+          <p>📞 WhatsApp Support: +91 92207 48426</p>
+          <p>✈️ Telegram Channel: +91 79832 61889</p>
+        </div>
+      </div>
+
+      <!-- Links Grid (Custom WhatsApp, Telegram, X Card Styling) -->
+      <div class="social-cards">
+        
+        <!-- WhatsApp -->
+        <a href="https://wa.me/919220748426" target="_blank" class="social-connect-card card-wa">
+          <div class="social-header">
+            <div class="social-icon">
+              <!-- WhatsApp Icon SVG -->
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.963C16.59 2.02 14.124.99 11.5.992c-5.441 0-9.87 4.372-9.874 9.802-.001 1.76.476 3.479 1.383 4.986l-.985 3.597 3.708-.962zm12.333-6.611c-.307-.153-1.82-.893-2.101-.994-.28-.102-.485-.153-.688.153-.203.305-.788 1.002-.966 1.205-.178.204-.355.229-.663.076-.307-.152-1.3-.478-2.478-1.521-.917-.811-1.536-1.815-1.716-2.121-.18-.306-.019-.471.134-.622.137-.137.307-.355.462-.533.153-.178.203-.306.307-.509.102-.204.051-.382-.026-.534-.076-.153-.688-1.649-.942-2.26-.248-.595-.501-.515-.688-.524-.178-.008-.382-.01-.586-.01-.203 0-.534.076-.814.382-.28.305-1.07 1.042-1.07 2.541 0 1.498 1.096 2.946 1.248 3.149.153.204 2.158 3.279 5.228 4.593.73.313 1.3.5 1.743.642.733.232 1.399.199 1.925.121.587-.087 1.82-.741 2.074-1.458.255-.718.255-1.332.178-1.458-.076-.127-.28-.203-.586-.356z"/></svg>
+            </div>
+            <div class="social-arrow">→</div>
+          </div>
+          <div class="social-info">
+            <span class="social-name">WhatsApp Helpdesk</span>
+            <span class="social-handle">+91 92207 48426</span>
+          </div>
+        </a>
+
+        <!-- Telegram -->
+        <a href="https://t.me/+917983261889" target="_blank" class="social-connect-card card-tg">
+          <div class="social-header">
+            <div class="social-icon">
+              <!-- Telegram Icon SVG -->
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18.717-.962 4.384-1.362 5.952-.169.664-.471 1.206-.693 1.227-.482.045-.847-.318-1.313-.623-.73-.477-1.139-.773-1.848-1.24-.819-.539-.288-.836.179-1.319.122-.126 2.247-2.062 2.288-2.234.005-.022.01-.1-.036-.141-.047-.042-.116-.027-.166-.016-.07.015-1.19.754-3.349 2.212-.317.218-.603.325-.86.32-.284-.006-.832-.161-1.239-.293-.499-.162-.896-.248-.861-.523.018-.143.215-.291.591-.444 2.308-1.004 3.847-1.666 4.617-1.986 2.195-.913 2.652-1.071 2.948-1.076.065-.001.21.016.304.093.079.065.101.155.109.223.009.071.013.223-.002.384z"/></svg>
+            </div>
+            <div class="social-arrow">→</div>
+          </div>
+          <div class="social-info">
+            <span class="social-name">Telegram Channel</span>
+            <span class="social-handle">+91 79832 61889</span>
+          </div>
+        </a>
+
+        <!-- Twitter / X -->
+        <a href="https://x.com/narendrakumarx" target="_blank" class="social-connect-card card-tw">
+          <div class="social-header">
+            <div class="social-icon">
+              <!-- Twitter/X Icon SVG -->
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </div>
+            <div class="social-arrow">→</div>
+          </div>
+          <div class="social-info">
+            <span class="social-name">Twitter / X</span>
+            <span class="social-handle">@narendrakumarx</span>
+          </div>
+        </a>
+
+        <!-- YouTube (Simulated channel with same name as narenTech-ai) -->
+        <a href="https://www.youtube.com/results?search_query=narenTech-ai" target="_blank" class="social-connect-card card-yt">
+          <div class="social-header">
+            <div class="social-icon">
+              <!-- YouTube Icon SVG -->
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.518 3.545 12 3.545 12 3.545s-7.518 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.87.508 9.388.508 9.388.508s7.518 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </div>
+            <div class="social-arrow">→</div>
+          </div>
+          <div class="social-info">
+            <span class="social-name">YouTube Channel</span>
+            <span class="social-handle">narenTech-ai</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 narenTech-ai. All rights reserved. Interactive simulations powered by JS Engine.</p>
+      <p style="display: flex; gap: 1rem;">
+        <a href="#" style="color: inherit; text-decoration: none;">Privacy Policy</a>
+        <span>•</span>
+        <a href="#" style="color: inherit; text-decoration: none;">Terms of Service</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Floating Autonomous AI Chatbot -->
+  <div class="chatbot-floating-trigger" id="chat-trigger" title="Ask narenTech Autonomous AI">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    <span class="chat-pulse"></span>
+  </div>
+
+  <div class="chatbot-container" id="chat-container">
+    <div class="chat-header">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <div style="width: 8px; height: 8px; background: var(--status-success); border-radius: 50%; box-shadow: 0 0 8px var(--status-success);"></div>
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem;">narenTech AI Agent</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">Autonomous Chatbot</div>
+        </div>
+      </div>
+      <button class="close-chat" id="close-chat">&times;</button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-bubble bot-msg">
+        Hi! I am the <strong>narenTech-ai Autonomous AI</strong>. Ask me anything about Artificial Intelligence, Machine Learning, Deep Learning, our Neural Sandbox, or how to contact Naren!
+      </div>
+    </div>
+    <div class="chat-quick-replies" id="chat-quick-replies">
+      <button class="quick-reply-btn" data-query="Explain Backpropagation">Explain Backpropagation</button>
+      <button class="quick-reply-btn" data-query="Why does XOR need hidden layers?">Why XOR needs hidden layers?</button>
+      <button class="quick-reply-btn" data-query="How does the Neural Sandbox work?">How to use simulator?</button>
+      <button class="quick-reply-btn" data-query="WhatsApp and Telegram contact info">Contact Info</button>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chat-input" placeholder="Type AI query (e.g. What is ReLU?)..." autocomplete="off">
+      <button id="chat-send-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
