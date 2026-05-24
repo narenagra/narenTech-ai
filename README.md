@@ -1,5 +1,3 @@
-# narenTech-ai
-static website narenTech-ai 
 # narenTech-ai Educational Platform
 
 A modern, highly interactive, dark-themed educational web application and interactive AI hub for **narenTech-ai**. Built entirely with vanilla HTML5, CSS3, and JavaScript, it is 100% client-side, lightweight, and fully optimized for hosting directly on **GitHub Pages**.

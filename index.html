@@ -297,133 +297,77 @@
       </div>
     </section>
 
-    <!-- TAB 4: INTERACTIVE AI SIMULATION -->
+    <!-- TAB 4: INTERACTIVE PONG SIMULATION -->
     <section id="sandbox-tab" class="tab-content">
       <div class="section-header">
         <div class="section-title-wrap">
-          <h2>Neural Sandbox</h2>
-          <p>Configure features, structure parameters, and visual training boundaries in real-time.</p>
+          <h2>AI Simulator</h2>
+          <p>An autonomous collision physics simulation where four AI paddle agents keep the ball in play to break pixel text.</p>
         </div>
       </div>
 
-      <div class="simulator-layout">
-        <!-- 1. Left Panel: parameters control -->
-        <div class="glass-card simulator-controls purple-glow">
-          <div class="simulator-group">
-            <h4>1. Choose Dataset</h4>
-            <div class="dataset-selector">
-              <button class="dataset-btn active" data-dataset="circle" title="Circular classification boundary">
-                <div style="width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid var(--accent-cyan); box-sizing: border-box;"></div>
-                Circle
-              </button>
-              <button class="dataset-btn" data-dataset="xor" title="Non-linear Exclusive OR pattern">
-                <div style="position: relative; width: 14px; height: 14px;">
-                  <div style="position: absolute; top:0; left:0; width:6px; height:6px; background:var(--accent-purple); border-radius:1px;"></div>
-                  <div style="position: absolute; bottom:0; right:0; width:6px; height:6px; background:var(--accent-purple); border-radius:1px;"></div>
-                  <div style="position: absolute; top:0; right:0; width:6px; height:6px; background:var(--accent-cyan); border-radius:50%;"></div>
-                  <div style="position: absolute; bottom:0; left:0; width:6px; height:6px; background:var(--accent-cyan); border-radius:50%;"></div>
-                </div>
-                XOR
-              </button>
-              <button class="dataset-btn" data-dataset="linear" title="Linearly separable data pattern">
-                <div style="width: 16px; height: 16px; position: relative;">
-                  <div style="position: absolute; width: 100%; height: 2px; background: var(--text-muted); top: 50%; transform: rotate(-45deg);"></div>
-                  <div style="position: absolute; top: 1px; left: 1px; width: 5px; height: 5px; background: var(--accent-cyan); border-radius: 50%;"></div>
-                  <div style="position: absolute; bottom: 1px; right: 1px; width: 5px; height: 5px; background: var(--accent-purple); border-radius: 1px;"></div>
-                </div>
-                Linear
-              </button>
-            </div>
+      <div class="glass-card purple-glow" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Canvas wrapper -->
+        <div id="pong-canvas-wrap" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 2px solid var(--border-color); box-shadow: 0 0 30px rgba(0,0,0,0.6);">
+          <canvas id="pongCanvas" style="display: block; width: 100%; height: 100%;"></canvas>
+          
+          <!-- Floating Status Badge -->
+          <div style="position: absolute; top: 1rem; right: 1rem; background: rgba(3,7,18,0.75); backdrop-filter: blur(8px); border: 1px solid var(--border-color); padding: 0.4rem 0.85rem; border-radius: 8px; font-size: 0.75rem; font-family: var(--font-mono); display: flex; align-items: center; gap: 0.5rem; pointer-events: none; z-index: 10;">
+            <span style="width: 6px; height: 6px; background: var(--status-success); border-radius: 50%; animation: pulseChat 1s infinite;"></span>
+            <span>BALL SPEED: <span id="val-badge-speed">1.0x</span></span>
           </div>
 
-          <div class="simulator-group">
-            <h4>2. Architecture Config</h4>
+          <!-- Floating Exit Instructions (Fullscreen only) -->
+          <div id="fullscreen-exit-badge" style="display: none; position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); background: rgba(3,7,18,0.85); backdrop-filter: blur(8px); border: 1px solid var(--border-color); padding: 0.6rem 1.25rem; border-radius: 9999px; font-size: 0.8rem; pointer-events: none; z-index: 9999; color: var(--text-secondary); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            Press <strong style="color: white; background: rgba(255,255,255,0.15); padding: 0.1rem 0.4rem; border-radius: 4px;">Esc</strong> or click exit button on bottom right to return
+          </div>
+          
+          <!-- Fullscreen Exit Button -->
+          <button id="btn-exit-fullscreen" style="display: none; position: absolute; bottom: 1.5rem; right: 1.5rem; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.35); color: #ef4444; padding: 0.5rem 1rem; border-radius: 8px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600; cursor: pointer; z-index: 9999; border: 1px solid rgba(239,68,68,0.5);">
+            Exit Fullscreen
+          </button>
+        </div>
+
+        <!-- Simulation Operations Dashboard -->
+        <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; align-items: center;">
+          
+          <!-- Operations Controls -->
+          <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+            <button class="btn btn-primary" id="btn-pong-reset">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              Reset Simulation
+            </button>
+            <button class="btn btn-secondary" id="btn-pong-text">
+              Toggle Phrase
+            </button>
+            <button class="btn btn-accent" id="btn-pong-fullscreen">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+              Go Fullscreen
+            </button>
+          </div>
+
+          <!-- Parameter Adjusters -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
             <div class="param-slider-wrap">
-              <div class="slider-label">
-                <span>Hidden Layers</span>
-                <span id="label-hidden-layers" style="font-weight:700; color:var(--accent-purple);">2</span>
+              <div class="slider-label" style="font-size: 0.85rem;">
+                <span>Simulation Ball Speed</span>
+                <span style="font-weight: 700; color: var(--accent-purple);" id="lbl-pong-speed">1.0x</span>
               </div>
-              <input type="range" id="slider-hidden-layers" min="1" max="4" value="2" step="1" style="width: 100%;">
+              <input type="range" id="slider-pong-speed" min="0.5" max="2.5" value="1.0" step="0.1" style="width: 100%;">
             </div>
             
-            <div id="neurons-controllers-container" style="display: flex; flex-direction: column; gap: 0.65rem; margin-top: 0.25rem;">
-              <!-- Dynamic nodes controllers based on number of layers -->
-            </div>
-          </div>
-
-          <div class="simulator-group">
-            <h4>3. Hyperparameters</h4>
-            <div class="param-grid">
-              <div class="param-slider-wrap">
-                <span class="slider-label" style="font-size: 0.75rem;">Learning Rate</span>
-                <select id="select-lr" class="form-control btn-sm" style="background: rgba(255,255,255,0.02); border-radius: 6px;">
-                  <option value="0.01">0.01</option>
-                  <option value="0.03" selected>0.03</option>
-                  <option value="0.1">0.1</option>
-                  <option value="0.3">0.3</option>
-                </select>
+            <div class="param-slider-wrap">
+              <div class="slider-label" style="font-size: 0.85rem;">
+                <span>AI Paddle Tracking Speed</span>
+                <span style="font-weight: 700; color: var(--accent-cyan);" id="lbl-pong-tracking">Fast (90%)</span>
               </div>
-              <div class="param-slider-wrap">
-                <span class="slider-label" style="font-size: 0.75rem;">Activation</span>
-                <select id="select-activation" class="form-control btn-sm" style="background: rgba(255,255,255,0.02); border-radius: 6px;">
-                  <option value="relu">ReLU</option>
-                  <option value="sigmoid">Sigmoid</option>
-                  <option value="tanh" selected>Tanh</option>
-                </select>
-              </div>
+              <input type="range" id="slider-pong-tracking" min="0.05" max="0.30" value="0.15" step="0.01" style="width: 100%;">
             </div>
           </div>
+
         </div>
 
-        <!-- 2. Center Panel: network drawing visualizer -->
-        <div class="glass-card network-graph-container">
-          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between;">
-            <span>Weights Visualizer</span>
-            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">Thicker lines = higher weights</span>
-          </h3>
-          <div class="network-canvas-wrap">
-            <svg id="networkSvg">
-              <!-- Synapses/Connections and Nodes are rendered dynamically -->
-            </svg>
-          </div>
-        </div>
-
-        <!-- 3. Right Panel: training boundary and plots -->
-        <div class="glass-card sim-output-container cyan-glow">
-          <h3 style="font-size: 1.1rem; font-weight: 700;">Decision Boundary</h3>
-          
-          <div class="sim-canvas-wrap">
-            <canvas id="boundaryCanvas" width="200" height="200"></canvas>
-          </div>
-
-          <div class="sim-metrics">
-            <div class="metric-card">
-              <div class="label">Epoch</div>
-              <div class="value" id="metric-epoch">0000</div>
-            </div>
-            <div class="metric-card">
-              <div class="label">Train Loss</div>
-              <div class="value" id="metric-loss">0.000</div>
-            </div>
-            <div class="metric-card">
-              <div class="label">Accuracy</div>
-              <div class="value" id="metric-accuracy">0.0%</div>
-            </div>
-          </div>
-
-          <div class="sim-control-panel">
-            <button class="btn btn-primary" id="btn-train-toggle">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-              Train Model
-            </button>
-            <button class="btn btn-secondary btn-sm" id="btn-train-step" title="Run single epoch">
-              Step
-            </button>
-            <button class="btn btn-secondary btn-sm" id="btn-train-reset" title="Reinitialize random weights">
-              Reset
-            </button>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -553,17 +497,17 @@
     </div>
     <div class="chat-messages" id="chat-messages">
       <div class="chat-bubble bot-msg">
-        Hi! I am the <strong>narenTech-ai Autonomous AI</strong>. Ask me anything about Artificial Intelligence, Machine Learning, Deep Learning, our Neural Sandbox, or how to contact Naren!
+        Hi! I am the <strong>narenTech-ai Autonomous AI Agent</strong>. Ask me anything about Prompt Engineering basics for beginners, what AI agents are, how our new Pong AI Simulator works, or how to contact Naren!
       </div>
     </div>
     <div class="chat-quick-replies" id="chat-quick-replies">
-      <button class="quick-reply-btn" data-query="Explain Backpropagation">Explain Backpropagation</button>
-      <button class="quick-reply-btn" data-query="Why does XOR need hidden layers?">Why XOR needs hidden layers?</button>
-      <button class="quick-reply-btn" data-query="How does the Neural Sandbox work?">How to use simulator?</button>
+      <button class="quick-reply-btn" data-query="What is an AI Agent?">What is an AI Agent?</button>
+      <button class="quick-reply-btn" data-query="Prompt engineering tips for beginners">Prompting tips for beginners</button>
+      <button class="quick-reply-btn" data-query="How does the Pong AI Simulator work?">How to use simulator?</button>
       <button class="quick-reply-btn" data-query="WhatsApp and Telegram contact info">Contact Info</button>
     </div>
     <div class="chat-input-area">
-      <input type="text" id="chat-input" placeholder="Type AI query (e.g. What is ReLU?)..." autocomplete="off">
+      <input type="text" id="chat-input" placeholder="Ask about Prompt Engineering or AI Agents..." autocomplete="off">
       <button id="chat-send-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
       </button>

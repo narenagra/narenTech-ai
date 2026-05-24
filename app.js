@@ -16,6 +16,14 @@ const state = {
   activeNoteId: null,
   activeVideoUrl: null,
   isAdmin: false, // Security constraint: regular visitors are read-only
+  pong: {
+    textMode: 0,
+    words: ["PROMPTING", "IS ALL YOU NEED"],
+    ballSpeedMultiplier: 1.0,
+    trackingSpeed: 0.15,
+    animationId: null,
+    isRunning: false
+  },
   // Neural Network Simulator Config
   nn: {
     dataset: 'circle', // 'circle', 'xor', 'linear'
@@ -213,12 +221,9 @@ function switchTab(tabId) {
 
   // Tab-specific initializations
   if (tabId === 'sandbox-tab') {
-    initNeuralNetworkSimulator();
+    initPongSimulator();
   } else {
-    // If leaving simulator, stop active training loop
-    if (state.nn.isTraining) {
-      toggleTraining(false);
-    }
+    stopPongSimulator();
   }
 }
 
@@ -559,536 +564,586 @@ function setupNotesUploadProgress(file) {
 }
 
 // ----------------------------------------------------
-// NEURAL NETWORK SIMULATOR ENGINE (MLP FROM SCRATCH)
+// PONG TEXT BREAKER INTERACTIVE ENGINE (21ST.DEV)
 // ----------------------------------------------------
 
-// Mathematical Kernels
-const Activations = {
-  tanh: {
-    f: x => Math.tanh(x),
-    df: fx => 1 - fx * fx
-  },
-  sigmoid: {
-    f: x => 1 / (1 + Math.exp(-x)),
-    df: fx => fx * (1 - fx)
-  },
-  relu: {
-    f: x => Math.max(0, x),
-    df: fx => fx > 0 ? 1 : 0
-  }
+const PIXEL_MAP = {
+  P: [
+    [1, 1, 1, 1],
+    [1, 0, 0, 1],
+    [1, 1, 1, 1],
+    [1, 0, 0, 0],
+    [1, 0, 0, 0],
+  ],
+  R: [
+    [1, 1, 1, 1],
+    [1, 0, 0, 1],
+    [1, 1, 1, 1],
+    [1, 0, 1, 0],
+    [1, 0, 0, 1],
+  ],
+  O: [
+    [1, 1, 1, 1],
+    [1, 0, 0, 1],
+    [1, 0, 0, 1],
+    [1, 0, 0, 1],
+    [1, 1, 1, 1],
+  ],
+  M: [
+    [1, 0, 0, 0, 1],
+    [1, 1, 0, 1, 1],
+    [1, 0, 1, 0, 1],
+    [1, 0, 0, 0, 1],
+    [1, 0, 0, 0, 1],
+  ],
+  T: [
+    [1, 1, 1, 1, 1],
+    [0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0],
+  ],
+  I: [
+    [1, 1, 1],
+    [0, 1, 0],
+    [0, 1, 0],
+    [0, 1, 0],
+    [1, 1, 1],
+  ],
+  N: [
+    [1, 0, 0, 0, 1],
+    [1, 1, 0, 0, 1],
+    [1, 0, 1, 0, 1],
+    [1, 0, 0, 1, 1],
+    [1, 0, 0, 0, 1],
+  ],
+  G: [
+    [1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0],
+    [1, 0, 1, 1, 1],
+    [1, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1],
+  ],
+  S: [
+    [1, 1, 1, 1],
+    [1, 0, 0, 0],
+    [1, 1, 1, 1],
+    [0, 0, 0, 1],
+    [1, 1, 1, 1],
+  ],
+  A: [
+    [0, 1, 1, 0],
+    [1, 0, 0, 1],
+    [1, 1, 1, 1],
+    [1, 0, 0, 1],
+    [1, 0, 0, 1],
+  ],
+  L: [
+    [1, 0, 0, 0],
+    [1, 0, 0, 0],
+    [1, 0, 0, 0],
+    [1, 0, 0, 0],
+    [1, 1, 1, 1],
+  ],
+  Y: [
+    [1, 0, 0, 0, 1],
+    [0, 1, 0, 1, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0],
+  ],
+  U: [
+    [1, 0, 0, 1],
+    [1, 0, 0, 1],
+    [1, 0, 0, 1],
+    [1, 0, 0, 1],
+    [1, 1, 1, 1],
+  ],
+  D: [
+    [1, 1, 1, 0],
+    [1, 0, 0, 1],
+    [1, 0, 0, 1],
+    [1, 0, 0, 1],
+    [1, 1, 1, 0],
+  ],
+  E: [
+    [1, 1, 1, 1],
+    [1, 0, 0, 0],
+    [1, 1, 1, 1],
+    [1, 0, 0, 0],
+    [1, 1, 1, 1],
+  ],
+  H: [
+    [1, 0, 0, 1],
+    [1, 0, 0, 1],
+    [1, 1, 1, 1],
+    [1, 0, 0, 1],
+    [1, 0, 0, 1],
+  ],
+  C: [
+    [1, 1, 1, 1],
+    [1, 0, 0, 0],
+    [1, 0, 0, 0],
+    [1, 0, 0, 0],
+    [1, 1, 1, 1],
+  ],
 };
 
-// Seed dataset patterns
-function generateSimulationData(pattern, count) {
-  const dataset = [];
-  const radius = 0.8;
+const PONG_COLOR_BG = "#030712"; // dark theme background
+const PONG_COLOR_PADDLE = "#06b6d4"; // glowing teal
+const PONG_COLOR_BALL = "#ec4899"; // glowing pink
+const PONG_LETTER_SPACING = 1;
+const PONG_WORD_SPACING = 3;
 
-  for (let i = 0; i < count; i++) {
-    // Generate random values in coordinates [-1.5, 1.5]
-    const x = (Math.random() * 3) - 1.5;
-    const y = (Math.random() * 3) - 1.5;
-    let label = 0;
+// Global Pong variables
+let pongCanvas = null;
+let pongCtx = null;
+let pongPixels = [];
+let pongBall = { x: 0, y: 0, dx: 0, dy: 0, radius: 0 };
+let pongPaddles = [];
+let pongScale = 1.0;
 
-    if (pattern === 'circle') {
-      const dist = Math.sqrt(x*x + y*y);
-      label = dist < radius ? 1 : 0;
-    } else if (pattern === 'xor') {
-      label = (x >= 0 && y >= 0) || (x < 0 && y < 0) ? 1 : 0;
-    } else if (pattern === 'linear') {
-      label = y > (0.3 * x + 0.1) ? 1 : 0;
-    }
-    // Add noise to make training look authentic
-    const noiseLevel = 0.05;
-    const finalX = x + (Math.random() * noiseLevel * 2 - noiseLevel);
-    const finalY = y + (Math.random() * noiseLevel * 2 - noiseLevel);
+function initPongSimulator() {
+  pongCanvas = document.getElementById('pongCanvas');
+  if (!pongCanvas) return;
+  pongCtx = pongCanvas.getContext('2d');
+  if (!pongCtx) return;
 
-    dataset.push({ x: finalX, y: finalY, label: label });
-  }
-  return dataset;
-}
-
-// Setup layers sizes based on DOM input configurations
-function computeArchitecture() {
-  const count = state.nn.hiddenLayers;
-  state.nn.layerSizes = [];
-  for (let i = 0; i < count; i++) {
-    const inputEl = document.getElementById(`neurons-layer-${i}`);
-    const size = inputEl ? parseInt(inputEl.value) : 3;
-    state.nn.layerSizes.push(size);
-  }
-}
-
-// Neural Network object initialization
-function initNeuralNetworkWeights() {
-  // Configured Architecture: [Inputs, ...HiddenLayers, Output]
-  const fullArch = [2, ...state.nn.layerSizes, 1];
-  state.nn.weights = [];
-  state.nn.biases = [];
-
-  for (let l = 1; l < fullArch.length; l++) {
-    const rows = fullArch[l];
-    const cols = fullArch[l-1];
-    
-    // Weight Matrix: W[l] dimensions (rows x cols)
-    const weightMatrix = [];
-    const biasVector = [];
-
-    for (let i = 0; i < rows; i++) {
-      const neuronWeights = [];
-      for (let j = 0; j < cols; j++) {
-        // Xavier/Glorot Initialization range
-        const limit = Math.sqrt(6 / (rows + cols));
-        neuronWeights.push(Math.random() * 2 * limit - limit);
-      }
-      weightMatrix.push(neuronWeights);
-      biasVector.push(Math.random() * 0.2 - 0.1);
-    }
-    state.nn.weights.push(weightMatrix);
-    state.nn.biases.push(biasVector);
-  }
-  state.nn.epoch = 0;
-}
-
-// MLP Forward Propagation
-function forwardProp(point) {
-  const inputs = [point.x, point.y];
-  const activations = [inputs];
-  const preActivations = [];
+  state.pong.isRunning = true;
   
-  const layersCount = state.nn.weights.length;
-  const actName = state.nn.activation;
+  // Set words in state
+  state.pong.words = state.pong.textMode === 0 
+    ? ["PROMPTING", "IS ALL YOU NEED"] 
+    : ["NARENTECH AI", "IS ALL YOU NEED"];
 
-  for (let l = 0; l < layersCount; l++) {
-    const w = state.nn.weights[l];
-    const b = state.nn.biases[l];
-    const prevA = activations[l];
-    
-    const nextA = [];
-    const nextZ = [];
-
-    // Compute dot product and add bias for each node in layer
-    for (let i = 0; i < w.length; i++) {
-      let sum = b[i];
-      for (let j = 0; j < prevA.length; j++) {
-        sum += prevA[j] * w[i][j];
-      }
-      nextZ.push(sum);
-      
-      // Determine output activation. Last layer is always Sigmoid for binary prediction
-      if (l === layersCount - 1) {
-        nextA.push(Activations.sigmoid.f(sum));
-      } else {
-        nextA.push(Activations[actName].f(sum));
-      }
-    }
-    
-    preActivations.push(nextZ);
-    activations.push(nextA);
-  }
-
-  return { activations, preActivations };
-}
-
-// Backpropagation algorithm execution
-function backPropagate(point) {
-  const { activations, preActivations } = forwardProp(point);
-  const y = point.label;
-  const layersCount = state.nn.weights.length;
+  resizePongCanvas();
   
-  const dW = [];
-  const db = [];
+  // Start loop
+  if (state.pong.animationId) cancelAnimationFrame(state.pong.animationId);
+  state.pong.animationId = requestAnimationFrame(pongGameLoop);
+}
+
+function stopPongSimulator() {
+  state.pong.isRunning = false;
+  if (state.pong.animationId) {
+    cancelAnimationFrame(state.pong.animationId);
+    state.pong.animationId = null;
+  }
+}
+
+function resizePongCanvas() {
+  if (!pongCanvas) return;
   
-  // Storage for layer error signals
-  const delta = new Array(layersCount);
+  const wrap = document.getElementById('pong-canvas-wrap');
+  if (wrap.classList.contains('fullscreen-mode')) {
+    pongCanvas.width = window.innerWidth;
+    pongCanvas.height = window.innerHeight;
+  } else {
+    // Fits container aspect ratio
+    pongCanvas.width = wrap.clientWidth;
+    pongCanvas.height = wrap.clientHeight;
+  }
   
-  // Output layer error gradient
-  const outputA = activations[layersCount][0];
-  // Binary Cross-Entropy gradient combined with Sigmoid derivative
-  delta[layersCount-1] = [outputA - y];
-
-  // Propagate derivative backwards
-  const actName = state.nn.activation;
-  for (let l = layersCount - 2; l >= 0; l--) {
-    const wNext = state.nn.weights[l+1];
-    const dNext = delta[l+1];
-    const z = preActivations[l];
-    const a = activations[l+1]; // Current layer activation values
-    
-    const dCurr = [];
-    for (let i = 0; i < wNext[0].length; i++) {
-      let errSum = 0;
-      for (let j = 0; j < wNext.length; j++) {
-        errSum += dNext[j] * wNext[j][i];
-      }
-      dCurr.push(errSum * Activations[actName].df(a[i]));
-    }
-    delta[l] = dCurr;
-  }
-
-  // Calculate gradients
-  for (let l = 0; l < layersCount; l++) {
-    const dL = delta[l];
-    const prevA = activations[l];
-    
-    const layerDW = [];
-    const layerDb = [];
-
-    for (let i = 0; i < dL.length; i++) {
-      const neuronDW = [];
-      for (let j = 0; j < prevA.length; j++) {
-        neuronDW.push(dL[i] * prevA[j]);
-      }
-      layerDW.push(neuronDW);
-      layerDb.push(dL[i]);
-    }
-    dW.push(layerDW);
-    db.push(layerDb);
-  }
-
-  return { dW, db };
+  pongScale = Math.min(pongCanvas.width / 1000, pongCanvas.height / 560);
+  initializePongGame();
 }
 
-// Train network for a single epoch (batch training update)
-function trainEpoch() {
-  const lr = state.nn.lr;
-  const data = state.nn.trainData;
-  const layersCount = state.nn.weights.length;
+function initializePongGame() {
+  if (!pongCanvas) return;
+  
+  const scale = pongScale;
+  const LARGE_PIXEL_SIZE = 8 * scale;
+  const SMALL_PIXEL_SIZE = 4 * scale;
+  const BASE_BALL_SPEED = 6 * scale;
 
-  // Aggregate weight updates over batch dataset
-  const batchDW = [];
-  const batchDb = [];
+  pongPixels = [];
+  const words = state.pong.words;
 
-  // Initialize grads structure
-  for (let l = 0; l < layersCount; l++) {
-    const w = state.nn.weights[l];
-    const layerDW = w.map(row => new Array(row.length).fill(0));
-    const layerDb = new Array(w.length).fill(0);
-    batchDW.push(layerDW);
-    batchDb.push(layerDb);
-  }
-
-  // Accumulate gradients
-  data.forEach(point => {
-    const { dW, db } = backPropagate(point);
-    for (let l = 0; l < layersCount; l++) {
-      for (let i = 0; i < dW[l].length; i++) {
-        for (let j = 0; j < dW[l][i].length; j++) {
-          batchDW[l][i][j] += dW[l][i][j];
-        }
-        batchDb[l][i] += db[l][i];
-      }
-    }
-  });
-
-  // Apply gradient update step with average updates
-  const n = data.length;
-  for (let l = 0; l < layersCount; l++) {
-    for (let i = 0; i < state.nn.weights[l].length; i++) {
-      for (let j = 0; j < state.nn.weights[l][i].length; j++) {
-        state.nn.weights[l][i][j] -= lr * (batchDW[l][i][j] / n);
-      }
-      state.nn.biases[l][i] -= lr * (batchDb[l][i] / n);
-    }
-  }
-
-  state.nn.epoch++;
-  evaluatePerformance();
-}
-
-// Calculate metrics (Loss & Accuracy)
-function evaluatePerformance() {
-  let lossSum = 0;
-  let correct = 0;
-  const data = state.nn.testData;
-
-  data.forEach(point => {
-    const { activations } = forwardProp(point);
-    const yPred = activations[activations.length - 1][0];
-    const y = point.label;
-    
-    // Cross entropy loss
-    const term1 = y * Math.log(Math.max(1e-15, yPred));
-    const term2 = (1 - y) * Math.log(Math.max(1e-15, 1 - yPred));
-    lossSum -= (term1 + term2);
-
-    const classification = yPred > 0.5 ? 1 : 0;
-    if (classification === y) correct++;
-  });
-
-  state.nn.loss = lossSum / data.length;
-  state.nn.accuracy = (correct / data.length) * 100;
-}
-
-// ----------------------------------------------------
-// SIMULATOR RENDERING & SVGS
-// ----------------------------------------------------
-
-// Render decision boundary mapping on 2D Canvas
-function drawDecisionBoundary() {
-  const canvas = document.getElementById('boundaryCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width;
-  const h = canvas.height;
-
-  // 1. Draw prediction boundary pixels (low resolution for performance)
-  const step = 4;
-  for (let u = 0; u < w; u += step) {
-    for (let v = 0; v < h; v += step) {
-      // Map pixel coordinates to range [-1.5, 1.5]
-      const x = (u / w) * 3 - 1.5;
-      const y = 1.5 - (v / h) * 3; // Flip Y for traditional Cartesian coords
-      
-      const { activations } = forwardProp({ x, y });
-      const yPred = activations[activations.length - 1][0];
-      
-      // Color interpolation: blue (class 1) to red (class 0)
-      const r = Math.floor((1 - yPred) * 60) + 15;
-      const g = Math.floor(yPred * 35) + 10;
-      const b = Math.floor(yPred * 140) + 30;
-      
-      ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-      ctx.fillRect(u, v, step, step);
-    }
-  }
-
-  // 2. Draw actual dataset points
-  const drawPoints = (dataset) => {
-    dataset.forEach(point => {
-      // Map Cartesian coordinates to Canvas coordinates
-      const cx = ((point.x + 1.5) / 3) * w;
-      const cy = ((1.5 - point.y) / 3) * h;
-      
-      // Predict class to show correct/incorrect outline indicator
-      const { activations } = forwardProp(point);
-      const pred = activations[activations.length - 1][0] > 0.5 ? 1 : 0;
-      const isCorrect = pred === point.label;
-      
-      ctx.beginPath();
-      ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-      ctx.fillStyle = point.label === 1 ? COLORS.accentPurple : COLORS.accentCyan;
-      ctx.fill();
-      
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = isCorrect ? '#ffffff' : '#ef4444';
-      ctx.stroke();
-    });
+  // Calculate word pixel size
+  const calculateWordWidth = (word, pixelSize) => {
+    return word.split("").reduce((width, letter) => {
+      const letterMap = PIXEL_MAP[letter];
+      const actualLetterWidth = letterMap ? letterMap[0].length : 4;
+      return width + actualLetterWidth * pixelSize + PONG_LETTER_SPACING * pixelSize;
+    }, 0) - PONG_LETTER_SPACING * pixelSize;
   };
 
-  drawPoints(state.nn.testData);
-}
-
-// Draw weights visualizer network SVG graph
-function drawNetworkGraph() {
-  const svg = document.getElementById('networkSvg');
-  if (!svg) return;
-  svg.innerHTML = ''; // Clear previous elements
+  const totalWidthLarge = calculateWordWidth(words[0], LARGE_PIXEL_SIZE);
+  const totalWidthSmall = words[1].split(" ").reduce((width, word, index) => {
+    return width + calculateWordWidth(word, SMALL_PIXEL_SIZE) + (index > 0 ? PONG_WORD_SPACING * SMALL_PIXEL_SIZE : 0);
+  }, 0);
+  const totalWidth = Math.max(totalWidthLarge, totalWidthSmall);
   
-  const width = svg.clientWidth || 380;
-  const height = svg.clientHeight || 400;
+  // Fit text to canvas width bounds
+  const scaleFactor = (pongCanvas.width * 0.75) / totalWidth;
+  const adjustedLargePixelSize = LARGE_PIXEL_SIZE * scaleFactor;
+  const adjustedSmallPixelSize = SMALL_PIXEL_SIZE * scaleFactor;
 
-  const fullArch = [2, ...state.nn.layerSizes, 1];
-  const layerCount = fullArch.length;
-  
-  // 1. Calculate node coordinates
-  const nodeCoords = [];
-  const layerSpacing = width / (layerCount + 0.3);
+  const largeTextHeight = 5 * adjustedLargePixelSize;
+  const smallTextHeight = 5 * adjustedSmallPixelSize;
+  const spaceBetweenLines = 5 * adjustedLargePixelSize;
+  const totalTextHeight = largeTextHeight + spaceBetweenLines + smallTextHeight;
 
-  for (let l = 0; l < layerCount; l++) {
-    const size = fullArch[l];
-    const x = (l + 0.65) * layerSpacing;
-    const nodeSpacing = height / (size + 1);
-    
-    const layerCoords = [];
-    for (let i = 0; i < size; i++) {
-      layerCoords.push({
-        x: x,
-        y: (i + 1) * nodeSpacing,
-        layer: l,
-        idx: i
+  let startY = (pongCanvas.height - totalTextHeight) / 2;
+
+  words.forEach((word, wordIndex) => {
+    const pixelSize = wordIndex === 0 ? adjustedLargePixelSize : adjustedSmallPixelSize;
+    const currentTextWidth = wordIndex === 0
+      ? calculateWordWidth(word, adjustedLargePixelSize)
+      : words[1].split(" ").reduce((width, w, index) => {
+          return width + calculateWordWidth(w, adjustedSmallPixelSize) + (index > 0 ? PONG_WORD_SPACING * adjustedSmallPixelSize : 0);
+        }, 0);
+
+    let startX = (pongCanvas.width - currentTextWidth) / 2;
+
+    if (wordIndex === 1) {
+      word.split(" ").forEach((subWord) => {
+        subWord.split("").forEach((letter) => {
+          const pixelMap = PIXEL_MAP[letter];
+          if (!pixelMap) return;
+
+          for (let i = 0; i < pixelMap.length; i++) {
+            for (let j = 0; j < pixelMap[i].length; j++) {
+              if (pixelMap[i][j]) {
+                const x = startX + j * pixelSize;
+                const y = startY + i * pixelSize;
+                pongPixels.push({ x, y, size: pixelSize, hit: false, char: letter });
+              }
+            }
+          }
+          startX += (pixelMap[0].length + PONG_LETTER_SPACING) * pixelSize;
+        });
+        startX += PONG_WORD_SPACING * adjustedSmallPixelSize;
+      });
+    } else {
+      word.split("").forEach((letter) => {
+        const pixelMap = PIXEL_MAP[letter];
+        if (!pixelMap) return;
+
+        for (let i = 0; i < pixelMap.length; i++) {
+          for (let j = 0; j < pixelMap[i].length; j++) {
+            if (pixelMap[i][j]) {
+              const x = startX + j * pixelSize;
+              const y = startY + i * pixelSize;
+              pongPixels.push({ x, y, size: pixelSize, hit: false, char: letter });
+            }
+          }
+        }
+        startX += (pixelMap[0].length + PONG_LETTER_SPACING) * pixelSize;
       });
     }
-    nodeCoords.push(layerCoords);
+    startY += wordIndex === 0 ? largeTextHeight + spaceBetweenLines : 0;
+  });
+
+  // Ball parameters
+  const ballStartX = pongCanvas.width * 0.85;
+  const ballStartY = pongCanvas.height * 0.15;
+  
+  pongBall = {
+    x: ballStartX,
+    y: ballStartY,
+    dx: -BASE_BALL_SPEED,
+    dy: BASE_BALL_SPEED,
+    radius: adjustedLargePixelSize / 1.7,
+  };
+
+  const paddleWidth = adjustedLargePixelSize;
+  const paddleLength = 9 * adjustedLargePixelSize;
+
+  // 4 Paddles: Left, Right, Top, Bottom
+  pongPaddles = [
+    {
+      x: 0,
+      y: pongCanvas.height / 2 - paddleLength / 2,
+      width: paddleWidth,
+      height: paddleLength,
+      targetY: pongCanvas.height / 2 - paddleLength / 2,
+      isVertical: true,
+    },
+    {
+      x: pongCanvas.width - paddleWidth,
+      y: pongCanvas.height / 2 - paddleLength / 2,
+      width: paddleWidth,
+      height: paddleLength,
+      targetY: pongCanvas.height / 2 - paddleLength / 2,
+      isVertical: true,
+    },
+    {
+      x: pongCanvas.width / 2 - paddleLength / 2,
+      y: 0,
+      width: paddleLength,
+      height: paddleWidth,
+      targetY: pongCanvas.width / 2 - paddleLength / 2,
+      isVertical: false,
+    },
+    {
+      x: pongCanvas.width / 2 - paddleLength / 2,
+      y: pongCanvas.height - paddleWidth,
+      width: paddleLength,
+      height: paddleWidth,
+      targetY: pongCanvas.width / 2 - paddleLength / 2,
+      isVertical: false,
+    },
+  ];
+}
+
+function updatePongGame() {
+  if (!pongCanvas) return;
+
+  const ball = pongBall;
+  const paddles = pongPaddles;
+  const speedMult = state.pong.ballSpeedMultiplier;
+
+  // Move ball
+  ball.x += ball.dx * speedMult;
+  ball.y += ball.dy * speedMult;
+
+  // Keep inside screen borders (fail-safe)
+  if (ball.y - ball.radius < 0) {
+    ball.y = ball.radius;
+    ball.dy = -ball.dy;
+  }
+  if (ball.y + ball.radius > pongCanvas.height) {
+    ball.y = pongCanvas.height - ball.radius;
+    ball.dy = -ball.dy;
+  }
+  if (ball.x - ball.radius < 0) {
+    ball.x = ball.radius;
+    ball.dx = -ball.dx;
+  }
+  if (ball.x + ball.radius > pongCanvas.width) {
+    ball.x = pongCanvas.width - ball.radius;
+    ball.dx = -ball.dx;
   }
 
-  // 2. Draw Synapses (Connections / Weights)
-  for (let l = 1; l < layerCount; l++) {
-    const prevLayer = nodeCoords[l-1];
-    const currLayer = nodeCoords[l];
-    const layerWeights = state.nn.weights[l-1];
-
-    for (let i = 0; i < currLayer.length; i++) {
-      const cNode = currLayer[i];
-      for (let j = 0; j < prevLayer.length; j++) {
-        const pNode = prevLayer[j];
-        const w = layerWeights[i][j];
-        
-        // Synapse thickness based on weight magnitude
-        const thickness = Math.min(6, Math.max(0.5, Math.abs(w) * 1.8));
-        
-        // Positive weights are teal, negative are purple
-        const color = w > 0 ? COLORS.accentCyan : COLORS.accentPurple;
-        const opacity = Math.min(0.85, Math.max(0.1, Math.abs(w) * 0.45));
-
-        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", pNode.x);
-        line.setAttribute("y1", pNode.y);
-        line.setAttribute("x2", cNode.x);
-        line.setAttribute("y2", cNode.y);
-        line.setAttribute("stroke", color);
-        line.setAttribute("stroke-width", thickness);
-        line.setAttribute("opacity", opacity);
-        line.setAttribute("class", "connection-line");
-        svg.appendChild(line);
+  // Intercept paddles collision
+  paddles.forEach((paddle) => {
+    if (paddle.isVertical) {
+      if (
+        ball.x - ball.radius < paddle.x + paddle.width &&
+        ball.x + ball.radius > paddle.x &&
+        ball.y > paddle.y &&
+        ball.y < paddle.y + paddle.height
+      ) {
+        ball.dx = -ball.dx;
+        // prevent clipping
+        if (paddle.x === 0) {
+          ball.x = paddle.x + paddle.width + ball.radius;
+        } else {
+          ball.x = paddle.x - ball.radius;
+        }
+      }
+    } else {
+      if (
+        ball.y - ball.radius < paddle.y + paddle.height &&
+        ball.y + ball.radius > paddle.y &&
+        ball.x > paddle.x &&
+        ball.x < paddle.x + paddle.width
+      ) {
+        ball.dy = -ball.dy;
+        // prevent clipping
+        if (paddle.y === 0) {
+          ball.y = paddle.y + paddle.height + ball.radius;
+        } else {
+          ball.y = paddle.y - ball.radius;
+        }
       }
     }
-  }
+  });
 
-  // 3. Draw Nodes (Neurons)
-  for (let l = 0; l < layerCount; l++) {
-    const layer = nodeCoords[l];
-    layer.forEach(node => {
-      // Determine node active state glow
-      let glowColor = 'rgba(255, 255, 255, 0.1)';
-      if (l === 0) glowColor = COLORS.accentCyan;
-      else if (l === layerCount - 1) glowColor = COLORS.accentPurple;
-      else glowColor = 'rgba(255,255,255,0.4)';
+  // AI agent movement (ease tracking of the ball)
+  paddles.forEach((paddle) => {
+    if (paddle.isVertical) {
+      paddle.targetY = ball.y - paddle.height / 2;
+      paddle.targetY = Math.max(0, Math.min(pongCanvas.height - paddle.height, paddle.targetY));
+      paddle.y += (paddle.targetY - paddle.y) * state.pong.trackingSpeed;
+    } else {
+      paddle.targetY = ball.x - paddle.width / 2;
+      paddle.targetY = Math.max(0, Math.min(pongCanvas.width - paddle.width, paddle.targetY));
+      paddle.x += (paddle.targetY - paddle.x) * state.pong.trackingSpeed;
+    }
+  });
 
-      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      circle.setAttribute("cx", node.x);
-      circle.setAttribute("cy", node.y);
-      circle.setAttribute("r", 9);
-      circle.setAttribute("fill", COLORS.bgCard);
-      circle.setAttribute("stroke", glowColor);
-      circle.setAttribute("stroke-width", 2.5);
-      circle.setAttribute("class", "neuron-circle");
+  // Text pixels collision breaking
+  pongPixels.forEach((pixel) => {
+    if (
+      !pixel.hit &&
+      ball.x + ball.radius > pixel.x &&
+      ball.x - ball.radius < pixel.x + pixel.size &&
+      ball.y + ball.radius > pixel.y &&
+      ball.y - ball.radius < pixel.y + pixel.size
+    ) {
+      pixel.hit = true;
+      const centerX = pixel.x + pixel.size / 2;
+      const centerY = pixel.y + pixel.size / 2;
       
-      // Add custom visual drop shadow glow on output/input layer nodes
-      if (l === 0 || l === layerCount - 1) {
-        circle.setAttribute("style", `filter: drop-shadow(0 0 4px ${glowColor});`);
+      // Reflect ball velocity vector
+      if (Math.abs(ball.x - centerX) > Math.abs(ball.y - centerY)) {
+        ball.dx = -ball.dx;
+      } else {
+        ball.dy = -ball.dy;
       }
-
-      svg.appendChild(circle);
-    });
-  }
-}
-
-// Update simulation status metrics in DOM
-function updateSimulatorDOMMetrics() {
-  document.getElementById('metric-epoch').textContent = String(state.nn.epoch).padStart(4, '0');
-  document.getElementById('metric-loss').textContent = state.nn.loss.toFixed(4);
-  document.getElementById('metric-accuracy').textContent = `${state.nn.accuracy.toFixed(1)}%`;
-}
-
-// Set layout selectors for dynamic hidden layer sizes adjustment
-function renderNeuronsControllers() {
-  const container = document.getElementById('neurons-controllers-container');
-  if (!container) return;
-
-  const count = state.nn.hiddenLayers;
-  let html = '';
-
-  for (let i = 0; i < count; i++) {
-    const currentVal = state.nn.layerSizes[i] || 3;
-    html += `
-      <div class="param-slider-wrap" style="padding-left: 0.5rem; border-left: 2px solid rgba(255, 255, 255, 0.05);">
-        <div class="slider-label" style="font-size: 0.8rem;">
-          <span>Layer ${i + 1} Size</span>
-          <span style="font-weight:700; color:var(--accent-cyan);" id="label-layer-size-${i}">${currentVal} nodes</span>
-        </div>
-        <input type="range" class="neuron-size-slider" data-layer-idx="${i}" id="neurons-layer-${i}" min="1" max="8" value="${currentVal}" step="1" style="width: 100%;">
-      </div>
-    `;
-  }
-
-  container.innerHTML = html;
-
-  // Bind change listeners to node controls
-  document.querySelectorAll('.neuron-size-slider').forEach(slider => {
-    slider.addEventListener('input', (e) => {
-      const idx = parseInt(e.target.getAttribute('data-layer-idx'));
-      const val = parseInt(e.target.value);
-      
-      document.getElementById(`label-layer-size-${idx}`).textContent = `${val} nodes`;
-      
-      state.nn.layerSizes[idx] = val;
-      
-      // Reinitialize weights for modified architecture sizes
-      initNeuralNetworkWeights();
-      drawNetworkGraph();
-      drawDecisionBoundary();
-      updateSimulatorDOMMetrics();
-    });
+    }
   });
 }
 
-// Toggle Loop Simulation
-function toggleTraining(forceState) {
-  const btn = document.getElementById('btn-train-toggle');
-  if (!btn) return;
+function drawPongGame() {
+  if (!pongCtx || !pongCanvas) return;
 
-  const nextState = forceState !== undefined ? forceState : !state.nn.isTraining;
-  state.nn.isTraining = nextState;
+  // Fill canvas dark theme background
+  pongCtx.fillStyle = PONG_COLOR_BG;
+  pongCtx.fillRect(0, 0, pongCanvas.width, pongCanvas.height);
 
-  if (nextState) {
-    btn.innerHTML = `
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="4" x2="18" y2="20"></line><line x1="6" y1="4" x2="6" y2="20"></line></svg>
-      Pause Sandbox
-    `;
-    btn.classList.add('btn-secondary');
-    btn.classList.remove('btn-primary');
-    
-    // Start recursion loop
-    const stepLoop = () => {
-      if (!state.nn.isTraining) return;
-      
-      // Run 5 training steps per frame for smooth boundaries progression
-      for (let i = 0; i < 5; i++) {
-        trainEpoch();
+  // Draw grid background overlay
+  pongCtx.strokeStyle = "rgba(255, 255, 255, 0.015)";
+  pongCtx.lineWidth = 1;
+  const cellSize = 30;
+  for (let x = 0; x < pongCanvas.width; x += cellSize) {
+    pongCtx.beginPath();
+    pongCtx.moveTo(x, 0);
+    pongCtx.lineTo(x, pongCanvas.height);
+    pongCtx.stroke();
+  }
+  for (let y = 0; y < pongCanvas.height; y += cellSize) {
+    pongCtx.beginPath();
+    pongCtx.moveTo(0, y);
+    pongCtx.lineTo(pongCanvas.width, y);
+    pongCtx.stroke();
+  }
+
+  // Draw text pixels: gradient color for unhit, dark slate for hit
+  pongPixels.forEach((pixel) => {
+    if (pixel.hit) {
+      pongCtx.fillStyle = "#1e293b"; // dark slate (hit state)
+    } else {
+      const yRel = pixel.y / pongCanvas.height;
+      if (yRel < 0.45) {
+        pongCtx.fillStyle = COLORS.accentPurple; // neon violet
+      } else if (yRel < 0.65) {
+        pongCtx.fillStyle = COLORS.accentPink; // neon pink
+      } else {
+        pongCtx.fillStyle = COLORS.accentCyan; // neon cyan
       }
-
-      drawDecisionBoundary();
-      drawNetworkGraph();
-      updateSimulatorDOMMetrics();
-      
-      state.nn.animationFrameId = requestAnimationFrame(stepLoop);
-    };
-    state.nn.animationFrameId = requestAnimationFrame(stepLoop);
-  } else {
-    btn.innerHTML = `
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-      Train Model
-    `;
-    btn.classList.add('btn-primary');
-    btn.classList.remove('btn-secondary');
-    
-    if (state.nn.animationFrameId) {
-      cancelAnimationFrame(state.nn.animationFrameId);
     }
+    pongCtx.fillRect(pixel.x, pixel.y, pixel.size, pixel.size);
+  });
+
+  // Draw ball (neon pink with glow)
+  pongCtx.shadowColor = COLORS.accentPink;
+  pongCtx.shadowBlur = 10;
+  pongCtx.fillStyle = PONG_COLOR_BALL;
+  pongCtx.beginPath();
+  pongCtx.arc(pongBall.x, pongBall.y, pongBall.radius, 0, Math.PI * 2);
+  pongCtx.fill();
+  pongCtx.shadowBlur = 0; // reset shadow
+
+  // Draw paddles (neon cyan with glow)
+  pongCtx.shadowColor = PONG_COLOR_PADDLE;
+  pongCtx.shadowBlur = 8;
+  pongCtx.fillStyle = PONG_COLOR_PADDLE;
+  pongPaddles.forEach((paddle) => {
+    pongCtx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+  });
+  pongCtx.shadowBlur = 0; // reset shadow
+}
+
+function pongGameLoop() {
+  if (!state.pong.isRunning) return;
+
+  updatePongGame();
+  drawPongGame();
+  
+  state.pong.animationId = requestAnimationFrame(pongGameLoop);
+}
+
+function enterFullscreenMode() {
+  const wrap = document.getElementById('pong-canvas-wrap');
+  if (!wrap) return;
+
+  if (wrap.requestFullscreen) {
+    wrap.requestFullscreen().catch(err => {
+      manuallyToggleFullscreen(true);
+    });
+  } else if (wrap.webkitRequestFullscreen) {
+    wrap.webkitRequestFullscreen();
+  } else if (wrap.msRequestFullscreen) {
+    wrap.msRequestFullscreen();
+  } else {
+    manuallyToggleFullscreen(true);
   }
 }
 
-// Complete Simulation Pipeline initialization
-function initNeuralNetworkSimulator() {
-  const pattern = state.nn.dataset;
-  
-  // 1. Generate local dummy patterns
-  state.nn.trainData = generateSimulationData(pattern, 100);
-  state.nn.testData = generateSimulationData(pattern, 60);
-
-  // 2. Setup Layer Configuration sliders
-  computeArchitecture();
-  
-  // 3. Initialize layers structures
-  initNeuralNetworkWeights();
-
-  // 4. Update view components
-  renderNeuronsControllers();
-  drawNetworkGraph();
-  drawDecisionBoundary();
-  evaluatePerformance();
-  updateSimulatorDOMMetrics();
+function exitFullscreenMode() {
+  if (
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement ||
+    document.msFullscreenElement
+  ) {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(err => console.log(err));
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  } else {
+    manuallyToggleFullscreen(false);
+  }
 }
+
+function manuallyToggleFullscreen(activate) {
+  const wrap = document.getElementById('pong-canvas-wrap');
+  const badge = document.getElementById('fullscreen-exit-badge');
+  const exitBtn = document.getElementById('btn-exit-fullscreen');
+  if (!wrap) return;
+
+  if (activate) {
+    wrap.classList.add('fullscreen-mode');
+    if (badge) badge.style.display = 'block';
+    if (exitBtn) exitBtn.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  } else {
+    wrap.classList.remove('fullscreen-mode');
+    if (badge) badge.style.display = 'none';
+    if (exitBtn) exitBtn.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  resizePongCanvas();
+}
+
+function handleFullscreenChange() {
+  const wrap = document.getElementById('pong-canvas-wrap');
+  const badge = document.getElementById('fullscreen-exit-badge');
+  const exitBtn = document.getElementById('btn-exit-fullscreen');
+  if (!wrap) return;
+
+  const isCurrentlyFullscreen = !!(
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement ||
+    document.msFullscreenElement
+  );
+
+  if (isCurrentlyFullscreen) {
+    wrap.classList.add('fullscreen-mode');
+    if (badge) badge.style.display = 'block';
+    if (exitBtn) exitBtn.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  } else {
+    wrap.classList.remove('fullscreen-mode');
+    if (badge) badge.style.display = 'none';
+    if (exitBtn) exitBtn.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  resizePongCanvas();
+}
+
+// Bind native fullscreen change listeners
+document.addEventListener('fullscreenchange', handleFullscreenChange);
+document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
 // ----------------------------------------------------
 // DOM EVENT BINDINGS & INIT
@@ -1295,69 +1350,84 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 7. Simulator controls bindings
-  // Dataset Selectors
-  document.querySelectorAll('.dataset-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      document.querySelectorAll('.dataset-btn').forEach(b => b.classList.remove('active'));
-      const target = e.currentTarget;
-      target.classList.add('active');
-      
-      state.nn.dataset = target.getAttribute('data-dataset');
-      initNeuralNetworkSimulator();
-    });
-  });
-
-  // Hidden Layers size selector
-  const layersSlider = document.getElementById('slider-hidden-layers');
-  if (layersSlider) {
-    layersSlider.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
-      document.getElementById('label-hidden-layers').textContent = val;
-      state.nn.hiddenLayers = val;
-      
-      initNeuralNetworkSimulator();
+  // 7. Pong Simulator controls bindings
+  const btnPongReset = document.getElementById('btn-pong-reset');
+  if (btnPongReset) {
+    btnPongReset.addEventListener('click', () => {
+      initializePongGame();
     });
   }
 
-  // Learning Rate and Activation selector binds
-  document.getElementById('select-lr').addEventListener('change', (e) => {
-    state.nn.lr = parseFloat(e.target.value);
+  const btnPongText = document.getElementById('btn-pong-text');
+  if (btnPongText) {
+    btnPongText.addEventListener('click', () => {
+      state.pong.textMode = state.pong.textMode === 0 ? 1 : 0;
+      state.pong.words = state.pong.textMode === 0 
+        ? ["PROMPTING", "IS ALL YOU NEED"] 
+        : ["NARENTECH AI", "IS ALL YOU NEED"];
+      initializePongGame();
+    });
+  }
+
+  const btnPongFullscreen = document.getElementById('btn-pong-fullscreen');
+  if (btnPongFullscreen) {
+    btnPongFullscreen.addEventListener('click', () => {
+      enterFullscreenMode();
+    });
+  }
+
+  const btnExitFullscreen = document.getElementById('btn-exit-fullscreen');
+  if (btnExitFullscreen) {
+    btnExitFullscreen.addEventListener('click', () => {
+      exitFullscreenMode();
+    });
+  }
+
+  // Handle ESC key to exit fullscreen mode
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const wrap = document.getElementById('pong-canvas-wrap');
+      if (wrap && wrap.classList.contains('fullscreen-mode')) {
+        exitFullscreenMode();
+      }
+    }
   });
 
-  document.getElementById('select-activation').addEventListener('change', (e) => {
-    state.nn.activation = e.target.value;
-    initNeuralNetworkWeights();
-    drawNetworkGraph();
-    drawDecisionBoundary();
-    evaluatePerformance();
-    updateSimulatorDOMMetrics();
-  });
+  const sliderPongSpeed = document.getElementById('slider-pong-speed');
+  if (sliderPongSpeed) {
+    sliderPongSpeed.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      state.pong.ballSpeedMultiplier = val;
+      const speedStr = val.toFixed(1) + 'x';
+      const lbl = document.getElementById('lbl-pong-speed');
+      if (lbl) lbl.textContent = speedStr;
+      const badge = document.getElementById('val-badge-speed');
+      if (badge) badge.textContent = speedStr;
+    });
+  }
 
-  // Simulation Operations triggers
-  document.getElementById('btn-train-toggle').addEventListener('click', () => toggleTraining());
-  
-  document.getElementById('btn-train-step').addEventListener('click', () => {
-    if (state.nn.isTraining) toggleTraining(false);
-    trainEpoch();
-    drawDecisionBoundary();
-    drawNetworkGraph();
-    updateSimulatorDOMMetrics();
-  });
+  const sliderPongTracking = document.getElementById('slider-pong-tracking');
+  if (sliderPongTracking) {
+    sliderPongTracking.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      state.pong.trackingSpeed = val;
+      
+      let speedDesc = 'Medium';
+      if (val < 0.10) {
+        speedDesc = 'Slow';
+      } else if (val > 0.20) {
+        speedDesc = 'Fast';
+      }
+      const pct = Math.round((val - 0.05) / 0.25 * 100);
+      const lbl = document.getElementById('lbl-pong-tracking');
+      if (lbl) lbl.textContent = `${speedDesc} (${pct}%)`;
+    });
+  }
 
-  document.getElementById('btn-train-reset').addEventListener('click', () => {
-    if (state.nn.isTraining) toggleTraining(false);
-    initNeuralNetworkWeights();
-    drawDecisionBoundary();
-    drawNetworkGraph();
-    evaluatePerformance();
-    updateSimulatorDOMMetrics();
-  });
-
-  // Re-adjust drawings on windows resize to prevent SVG layout clipping
+  // Re-adjust drawings on windows resize to prevent simulation aspect layout issues
   window.addEventListener('resize', () => {
     if (state.activeTab === 'sandbox-tab') {
-      drawNetworkGraph();
+      resizePongCanvas();
     }
   });
 
@@ -1541,51 +1611,46 @@ function removeChatTypingIndicator() {
 function getAutonomousResponse(query) {
   const q = query.toLowerCase();
 
-  // 1. Backpropagation
-  if (q.includes('backprop') || q.includes('back propagation') || q.includes('backward pass') || q.includes('chain rule')) {
-    return "💡 **Backpropagation** is the algorithm used to calculate weight gradients. It works by calculating the derivative of the **Loss Function** relative to each weight, starting from the output layer and propagating backwards using the calculus **Chain Rule**. W = W - lr * dL/dW. Check our **Study Notes** tab for a math trace!";
+  // 1. What is an AI Agent?
+  if (q.includes('agent') || q.includes('basic agent') || q.includes('autonomous agent')) {
+    return "🤖 An **AI Agent** is an autonomous software entity that observes its environment (perceives), makes decisions, and performs actions to achieve specific goals. In our **AI Simulator**, the four paddles are basic AI agents—they track the ball's coordinate in real-time and position themselves dynamically to keep the ball in play without human intervention.";
   }
 
-  // 2. XOR problem
-  if (q.includes('xor') || q.includes('exclusive or')) {
-    return "🧩 The **XOR problem** is a non-linear classification puzzle. A single-layer perceptron (straight line) cannot solve it. To solve XOR, we need at least **one hidden layer** with non-linear activation functions (like Tanh). Try it in our **Neural Sandbox** tab to visualize the curved boundary convergence!";
+  // 2. Prompt Engineering / General Prompts Knowledge for Beginners
+  if (q.includes('prompt') || q.includes('engineering') || q.includes('tips') || q.includes('beginner') || q.includes('knowledge')) {
+    return "💡 **Prompt Engineering for Beginners:**\n1. **Be Specific**: Clearly state the task, context, and constraints.\n2. **Assign a Role**: Start with 'You are an expert copywriter...' to set the persona.\n3. **Provide Examples (Few-Shot)**: Show the AI a few examples of desired input and output.\n4. **Format the Output**: Ask for bullet points, JSON, or markdown tables.\n*Remember*: **Prompting is all you need** to tap into the power of large language models!";
   }
 
-  // 3. Neural Sandbox / Simulator
-  if (q.includes('sandbox') || q.includes('simulator') || q.includes('train') || q.includes('epoch') || q.includes('weight')) {
-    return "⚙️ **Neural Sandbox Help:**\n1. Select a dataset (Circle, XOR, Linear).\n2. Add hidden layers using the architecture slider.\n3. Click **Train Model** to run. You'll see lines (synapses) adjust thickness/color: **Cyan** indicates positive weights, **Purple** indicates negative weights. The canvas visualizes the decision boundary!";
+  // 3. Pong AI Simulator / New Simulator Page
+  if (q.includes('sandbox') || q.includes('simulator') || q.includes('pong') || q.includes('play') || q.includes('game') || q.includes('phrase') || q.includes('text')) {
+    return "🎮 **New AI Simulator Page Help:**\n* It is a collision physics sandbox where four AI paddle agents track the ball dynamically to break text pixels.\n* You can adjust **Simulation Ball Speed** and **AI Paddle Tracking Speed** using the sliders.\n* Click **Toggle Phrase** to switch phrases or **Reset Simulation** to clear the grid.\n* Try clicking **Go Fullscreen** for an immersive, distraction-free view!";
   }
 
-  // 4. Activation functions (ReLU, Sigmoid, Tanh)
-  if (q.includes('activation') || q.includes('relu') || q.includes('sigmoid') || q.includes('tanh')) {
-    return "⚡ **Activation Functions** introduce non-linearity into neurons: \n*   **Tanh:** Outputs [-1, 1]. Great for hidden layers.\n*   **ReLU:** Outputs max(0, x). Solves vanishing gradient problems.\n*   **Sigmoid:** Outputs [0, 1]. Excellent for output layer classification probabilities.";
-  }
-
-  // 5. Contact support / WhatsApp / Telegram
+  // 4. Contact support / WhatsApp / Telegram
   if (q.includes('contact') || q.includes('whatsapp') || q.includes('telegram') || q.includes('phone') || q.includes('number') || q.includes('support') || q.includes('naren')) {
     return "📞 **Official Support Channels:**\n*   **WhatsApp Support:** [+91 92207 48426](https://wa.me/919220748426)\n*   **Telegram Support:** [+91 79832 61889](https://t.me/+917983261889)\n*   **Twitter / X:** [@narendrakumarx](https://x.com/narendrakumarx)\nFeel free to send a message directly to Naren!";
   }
 
-  // 6. Notes / PDF
+  // 5. Notes / PDF
   if (q.includes('note') || q.includes('pdf') || q.includes('study') || q.includes('markdown') || q.includes('document')) {
-    return "📚 Master DL concepts in our **Study Notes** tab! You can read preloaded notes or drag-and-drop your own `.txt` or `.md` files to render them dynamically with formatting, text scaling, and clipboard copying.";
+    return "📚 Learn AI fundamentals in our **Study Notes** tab! Read notes on AI foundations or drag-and-drop your own `.txt` or `.md` files to read them with format parsing and text resizing.";
   }
 
-  // 7. YouTube
+  // 6. YouTube
   if (q.includes('youtube') || q.includes('channel') || q.includes('video') || q.includes('tutorial') || q.includes('sub')) {
-    return "🎥 Subscribe to our channel **narenTech-ai** on YouTube for deep-dive tutorials on AI and coding. Click the YouTube link in our footer, or browse our local simulated dashboard catalog under the **Video Hub** tab!";
+    return "🎥 Subscribe to our YouTube channel **narenTech-ai** for video courses on AI, Machine Learning, and programming. Check out tutorials right under the **Video Hub** tab!";
   }
 
-  // 8. General greetings
+  // 7. General greetings
   if (q.includes('hi') || q.includes('hello') || q.includes('hey') || q.includes('greetings') || q.includes('welcome') || q.includes('thank')) {
-    return "👋 Hello! I am the **narenTech-ai Autonomous AI Assistant**. I can help clarify topics like Backpropagation, ReLU/Tanh activations, the XOR problem, and explain how to use our sandbox simulator. What are you studying today?";
+    return "👋 Hello! I am the **narenTech-ai Autonomous AI Assistant**. I can help you learn about **AI Agents**, **Prompt Engineering for Beginners**, use our **Pong AI Simulator**, or connect with Naren. What are you studying today?";
   }
 
   // Fallbacks
   const fallbacks = [
-    "🧠 That's an intriguing AI topic! In Deep Learning, we solve complex boundaries by chaining nodes. Try configuring a multi-layer perceptron in our **Neural Sandbox** to train a classification boundary locally, or check our **Study Notes** for details.",
-    "🚀 As an autonomous agent, I recommend checking our **Study Notes** tab for in-depth AI theory, or launching our real-time **Neural Sandbox** visualizer to see backpropagation in action!",
-    "💡 Interesting question! For AI implementation questions, you can also chat directly with our team on WhatsApp: [+91 92207 48426](https://wa.me/919220748426) or connect via Telegram: [+91 79832 61889](https://t.me/+917983261889)."
+    "🧠 That's an intriguing AI topic! I recommend checking our **Study Notes** tab to read up on basic AI concepts, or launching our **AI Simulator** to watch autonomous paddle agents react in real-time.",
+    "🚀 Want to learn more? Check out our **Study Notes** on AI architecture, or ask me about **Prompt Engineering tips for beginners**!",
+    "💡 For direct help or inquiries, feel free to contact Naren on WhatsApp: [+91 92207 48426](https://wa.me/919220748426) or Telegram: [+91 79832 61889](https://t.me/+917983261889)."
   ];
   return fallbacks[Math.floor(Math.random() * fallbacks.length)];
 }

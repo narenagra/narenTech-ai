@@ -1623,5 +1623,23 @@ body.admin-mode #video-hub-wrapper {
   }
 }
 
+/* Pong Simulation Styles */
+#pong-canvas-wrap.fullscreen-mode {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99999 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#pong-canvas-wrap.fullscreen-mode canvas {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+
 
 
