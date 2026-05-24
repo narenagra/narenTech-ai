@@ -33,10 +33,10 @@ A modern, highly interactive, dark-themed educational web application and intera
 5. **Community Connections Footer:**
    - Beautiful, glassmorphic contact cards with customized hover animations and official SVG logos.
    - Directly links to the provided configurations:
-     - **WhatsApp Helpdesk:** `+91 92207 48426`
-     - **Telegram Channel:** `+91 79832 61889`
+     - **WhatsApp Helpdesk:** Dynamic Chat Support link (obfuscated to prevent scraping)
+     - **Telegram Channel:** Dynamic Channel link (obfuscated to prevent scraping)
      - **Twitter / X:** `@narendrakumarx`
-     - **YouTube Channel:** `narenTech-ai`
+     - **YouTube Channel:** `@narenTech-ai`
 
 ---
 

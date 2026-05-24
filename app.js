@@ -8,6 +8,17 @@ const COLORS = {
   textMuted: '#6b7280'
 };
 
+// Obfuscated contact links to prevent scrapers from harvesting phone numbers
+const getWaLink = () => {
+  const parts = ["https://", "wa.me", "/91", "922", "074", "8426"];
+  return parts.join("");
+};
+
+const getTgLink = () => {
+  const parts = ["https://", "t.me", "/+", "w4GC", "Deif", "6c5j", "NDFl"];
+  return parts.join("");
+};
+
 // Global application state
 const state = {
   activeTab: 'dashboard-tab',
@@ -1153,6 +1164,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Local storage
   initializeStorage();
   
+  // Set dynamic contact links & texts to hide raw numbers from source code
+  document.querySelectorAll('.wa-dynamic-link').forEach(el => {
+    el.href = getWaLink();
+  });
+  document.querySelectorAll('.tg-dynamic-link').forEach(el => {
+    el.href = getTgLink();
+  });
+  document.querySelectorAll('.wa-dynamic-text').forEach(el => {
+    el.textContent = "Chat Support";
+  });
+  document.querySelectorAll('.tg-dynamic-text').forEach(el => {
+    el.textContent = "Join Channel";
+  });
+  
   // Initialize Admin Mode status from sessionStorage
   if (sessionStorage.getItem('narentech_is_admin') === 'true') {
     state.isAdmin = true;
@@ -1628,7 +1653,7 @@ function getAutonomousResponse(query) {
 
   // 4. Contact support / WhatsApp / Telegram
   if (q.includes('contact') || q.includes('whatsapp') || q.includes('telegram') || q.includes('phone') || q.includes('number') || q.includes('support') || q.includes('naren')) {
-    return "📞 **Official Support Channels:**\n*   **WhatsApp Support:** [+91 92207 48426](https://wa.me/919220748426)\n*   **Telegram Support:** [+91 79832 61889](https://t.me/+917983261889)\n*   **Twitter / X:** [@narendrakumarx](https://x.com/narendrakumarx)\nFeel free to send a message directly to Naren!";
+    return `📞 **Official Support Channels:**\n*   **WhatsApp Support:** [Open Chat](${getWaLink()})\n*   **Telegram Support:** [Open Chat](${getTgLink()})\n*   **Twitter / X:** [@narendrakumarx](https://x.com/narendrakumarx)\nFeel free to send a message directly to Naren!`;
   }
 
   // 5. Notes / PDF
@@ -1650,7 +1675,7 @@ function getAutonomousResponse(query) {
   const fallbacks = [
     "🧠 That's an intriguing AI topic! I recommend checking our **Study Notes** tab to read up on basic AI concepts, or launching our **AI Simulator** to watch autonomous paddle agents react in real-time.",
     "🚀 Want to learn more? Check out our **Study Notes** on AI architecture, or ask me about **Prompt Engineering tips for beginners**!",
-    "💡 For direct help or inquiries, feel free to contact Naren on WhatsApp: [+91 92207 48426](https://wa.me/919220748426) or Telegram: [+91 79832 61889](https://t.me/+917983261889)."
+    `💡 For direct help or inquiries, feel free to contact Naren on [WhatsApp](${getWaLink()}) or [Telegram](${getTgLink()}).`
   ];
   return fallbacks[Math.floor(Math.random() * fallbacks.length)];
 }
