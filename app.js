@@ -1408,12 +1408,79 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Kids Arcade Fullscreen Controls
+  const btnArcadeFullscreen = document.getElementById('btn-arcade-fullscreen');
+  if (btnArcadeFullscreen) {
+    btnArcadeFullscreen.addEventListener('click', () => {
+      const container = document.getElementById('kids-arcade-container');
+      if (!container) return;
+      if (container.requestFullscreen) {
+        container.requestFullscreen();
+      } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+      } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen();
+      }
+    });
+  }
+
+  const btnExitArcadeFullscreen = document.getElementById('btn-exit-arcade-fullscreen');
+  if (btnExitArcadeFullscreen) {
+    btnExitArcadeFullscreen.addEventListener('click', () => {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(err => console.log(err));
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    });
+  }
+
+  const handleArcadeFullscreenChange = () => {
+    const container = document.getElementById('kids-arcade-container');
+    const exitBtn = document.getElementById('btn-exit-arcade-fullscreen');
+    if (!container) return;
+
+    const isFullscreen = !!(
+      document.fullscreenElement === container ||
+      document.webkitFullscreenElement === container ||
+      document.mozFullScreenElement === container ||
+      document.msFullscreenElement === container
+    );
+
+    if (isFullscreen) {
+      container.classList.add('fullscreen-mode');
+      if (exitBtn) exitBtn.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    } else {
+      container.classList.remove('fullscreen-mode');
+      if (exitBtn) exitBtn.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  };
+
+  document.addEventListener('fullscreenchange', handleArcadeFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', handleArcadeFullscreenChange);
+  document.addEventListener('mozfullscreenchange', handleArcadeFullscreenChange);
+  document.addEventListener('MSFullscreenChange', handleArcadeFullscreenChange);
+
   // Handle ESC key to exit fullscreen mode
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       const wrap = document.getElementById('pong-canvas-wrap');
       if (wrap && wrap.classList.contains('fullscreen-mode')) {
         exitFullscreenMode();
+      }
+      const arcadeContainer = document.getElementById('kids-arcade-container');
+      if (arcadeContainer && arcadeContainer.classList.contains('fullscreen-mode')) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(err => console.log(err));
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
       }
     }
   });

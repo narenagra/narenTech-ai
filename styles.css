@@ -1160,12 +1160,12 @@ textarea.form-control {
 
 /* Footer Section */
 footer {
-  margin-top: 5rem;
+  margin-top: 2rem;
   border-top: 1px solid var(--border-color);
   background: rgba(3, 7, 18, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  padding: 4rem 2rem 2rem 2rem;
+  padding: 2rem 2rem 1.5rem 2rem;
 }
 
 .footer-content {
@@ -1173,39 +1173,40 @@ footer {
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1.5fr;
-  gap: 4rem;
-  margin-bottom: 3rem;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 @media (max-width: 900px) {
   .footer-content {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
   }
 }
 
 .footer-brand h3 {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .footer-brand p {
   color: var(--text-secondary);
   max-width: 400px;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
 }
 
 .footer-brand .links-wrap {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .social-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
 }
 
 .social-connect-card {
@@ -1214,18 +1215,18 @@ footer {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 1.5rem;
-  padding: 1.25rem;
-  border-radius: 12px;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border-color);
   transition: var(--transition-normal);
 }
 
 .social-connect-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: var(--hover-border-color);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px var(--hover-glow-color);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.3), 0 0 10px var(--hover-glow-color);
 }
 
 .social-header {
@@ -1235,34 +1236,41 @@ footer {
 }
 
 .social-icon {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--icon-color);
+  display: flex;
+  align-items: center;
+}
+
+.social-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .social-arrow {
   color: var(--text-muted);
-  font-size: 1.2rem;
+  font-size: 1rem;
   transition: var(--transition-fast);
 }
 
 .social-connect-card:hover .social-arrow {
   color: var(--text-primary);
-  transform: translateX(3px);
+  transform: translateX(2px);
 }
 
 .social-info {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.1rem;
 }
 
 .social-name {
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
 .social-handle {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 
@@ -1295,11 +1303,11 @@ footer {
   max-width: 1300px;
   margin: 0 auto;
   border-top: 1px solid var(--border-color);
-  padding-top: 2rem;
+  padding-top: 1.25rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
 }
 
@@ -1638,6 +1646,104 @@ body.admin-mode #video-hub-wrapper {
 #pong-canvas-wrap.fullscreen-mode canvas {
   width: 100vw !important;
   height: 100vh !important;
+}
+
+/* Kids Arcade Fullscreen Styles */
+#kids-arcade-container.fullscreen-mode {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99999 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: #05040f !important;
+}
+
+#kids-arcade-container.fullscreen-mode iframe {
+  border-radius: 0 !important;
+}
+
+/* ==========================================================================
+   KIDS ARCADE COMPACT FOOTER STYLING
+   ========================================================================== */
+/* When the Kids Arcade or Dashboard tab is active, we shrink the footer to prevent page scrollbar */
+body:has(#kids-arcade-tab.active) footer,
+body:has(#dashboard-tab.active) footer {
+  margin-top: 1rem !important;
+  padding: 1rem 2rem 1rem 2rem !important;
+}
+
+body:has(#kids-arcade-tab.active) .footer-content,
+body:has(#dashboard-tab.active) .footer-content {
+  margin-bottom: 0.75rem !important;
+  gap: 1.5rem !important;
+  grid-template-columns: 1fr 2.5fr !important;
+}
+
+body:has(#kids-arcade-tab.active) .footer-brand p,
+body:has(#dashboard-tab.active) .footer-brand p {
+  display: none !important; /* Hide description text */
+}
+
+body:has(#kids-arcade-tab.active) .footer-brand h3,
+body:has(#dashboard-tab.active) .footer-brand h3 {
+  margin-bottom: 0.25rem !important;
+}
+
+body:has(#kids-arcade-tab.active) .footer-brand,
+body:has(#dashboard-tab.active) .footer-brand {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+body:has(#kids-arcade-tab.active) .social-cards,
+body:has(#dashboard-tab.active) .social-cards {
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 0.5rem !important;
+}
+
+body:has(#kids-arcade-tab.active) .social-connect-card,
+body:has(#dashboard-tab.active) .social-connect-card {
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.4rem !important;
+  padding: 0.4rem 0.6rem !important;
+  border-radius: 6px !important;
+  height: auto !important;
+}
+
+body:has(#kids-arcade-tab.active) .social-connect-card .social-arrow,
+body:has(#kids-arcade-tab.active) .social-connect-card .social-handle,
+body:has(#dashboard-tab.active) .social-connect-card .social-arrow,
+body:has(#dashboard-tab.active) .social-connect-card .social-handle {
+  display: none !important; /* Hide arrow and subtext */
+}
+
+body:has(#kids-arcade-tab.active) .social-connect-card .social-icon,
+body:has(#dashboard-tab.active) .social-connect-card .social-icon {
+  font-size: 1rem !important;
+}
+
+body:has(#kids-arcade-tab.active) .social-connect-card .social-icon svg,
+body:has(#dashboard-tab.active) .social-connect-card .social-icon svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+body:has(#kids-arcade-tab.active) .social-connect-card .social-name,
+body:has(#dashboard-tab.active) .social-connect-card .social-name {
+  font-size: 0.75rem !important;
+}
+
+body:has(#kids-arcade-tab.active) .footer-bottom,
+body:has(#dashboard-tab.active) .footer-bottom {
+  padding-top: 0.75rem !important;
 }
 
 

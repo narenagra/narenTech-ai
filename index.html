@@ -36,6 +36,10 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"></circle><circle cx="5" cy="19" r="3"></circle><circle cx="19" cy="19" r="3"></circle><line x1="5" y1="16" x2="19" y2="16"></line><line x1="5" y1="16" x2="12" y2="8"></line><line x1="19" y1="16" x2="12" y2="8"></line></svg>
         AI Simulator
       </button>
+      <button class="nav-item" data-tab="kids-arcade-tab">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect><path d="M6 12h12M12 6v12"/></svg>
+        Kids Arcade
+      </button>
     </nav>
 
     <div style="display: flex; gap: 0.5rem; align-items: center;">
@@ -368,6 +372,29 @@
 
         </div>
 
+      </div>
+    </section>
+
+    <!-- TAB 5: KIDS INTERACTIVE ARCADE -->
+    <section id="kids-arcade-tab" class="tab-content">
+      <div class="section-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <div class="section-title-wrap">
+          <h2>Kids Play Arcade</h2>
+          <p>Interactive games designed to develop logic, reflex typing, and chess strategies.</p>
+        </div>
+        <button class="btn btn-accent" id="btn-arcade-fullscreen">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          Go Fullscreen
+        </button>
+      </div>
+      
+      <!-- Full-height styled iframe container for kids-arcade subproject -->
+      <div id="kids-arcade-container" class="glass-card purple-glow" style="padding: 0.5rem; height: 82vh; border-radius: 16px; overflow: hidden; background: #05040f; border: 1px solid var(--border-color); position: relative;">
+        <!-- Floating Exit Button (Fullscreen only) -->
+        <button id="btn-exit-arcade-fullscreen" style="display: none; position: absolute; bottom: 1.5rem; right: 1.5rem; background: rgba(239, 68, 68, 0.8); border: 1px solid rgba(239, 68, 68, 0.9); color: #fff; padding: 0.5rem 1rem; border-radius: 8px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600; cursor: pointer; z-index: 9999;">
+          Exit Fullscreen
+        </button>
+        <iframe src="kids-arcade/index.html" style="width: 100%; height: 100%; border: none; border-radius: 12px; display: block;" title="Kids Play Arcade" allowfullscreen></iframe>
       </div>
     </section>
 

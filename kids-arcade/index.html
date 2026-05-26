@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="narenTech Play Arcade - Interactive educational games for school students. Play Math Tic-Tac-Toe, Alpha Shoot keyboard typing, and Chess Trainer.">
+  <title>narenTech Play Arcade - Play & Learn Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Font Awesome Icons for beautiful modern symbols -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- BACKGROUND ATMOSPHERICS -->
+  <canvas id="starfield"></canvas>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- SHELL NAV HEADER -->
+  <header class="shell-header">
+    <div class="logo-container">
+      <i class="fa-solid fa-gamepad"></i>
+      <span>NARENTECH ARCADE</span>
+    </div>
+    
+    <div class="header-progress">
+      <div class="score-badge">
+        <i class="fa-solid fa-star"></i>
+        <span>Score: <strong id="scoreVal">0</strong> XP</span>
+      </div>
+      <button class="btn-cosmic btn-glass" style="padding: 0.4rem 1rem; border-radius:50px; font-size: 0.8rem;" onclick="resetProgress()">
+        Reset Score
+      </button>
+    </div>
+  </header>
+
+  <!-- ==============================================
+       MAIN PORTAL VIEW (LANDING PAGE)
+       ============================================== -->
+  <main id="portal-panel" class="portal-container">
+    
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <div class="hero-tag">
+        <span></span> Classes 5 - 10 Learning Portal
+      </div>
+      <h1 class="hero-title">
+        Play, Think & Learn: <br>
+        <span>narenTech Play Arcade</span>
+      </h1>
+      <p class="hero-desc">
+        Welcome to your brain academy! Develop strong mental calculation skills, computer typing velocity, and strategic chess openings by playing these three beautiful interactive games. Play against base AI, solve levels, and earn XP badges.
+      </p>
+    </section>
+
+    <!-- Games Card Grid -->
+    <section class="games-grid">
+      
+      <!-- Game 1: Math Tic-Tac-Toe -->
+      <article class="arcade-card hoverable">
+        <div class="game-img-wrapper">
+          <img src="images/tic-tac.jfif" alt="Math Combat" class="game-img">
+        </div>
+        <div class="game-tag-row">
+          <span class="game-tag tag-cyan">Math & Speed</span>
+          <span class="game-tag tag-yellow">Classes 5-8</span>
+        </div>
+        <h3 class="game-title">Ganit Combat (Math Tic-Tac-Toe)</h3>
+        <p class="game-desc">
+          Take on a smart computer opponent in classic Tic-Tac-Toe! But wait—to mark a square, you must solve a mental math calculation first. Solve correctly to claim your cells!
+        </p>
+        <button class="btn-play btn-cyan-glow" onclick="launchGame('math-tictactoe')">
+          Launch Game <i class="fa-solid fa-circle-play"></i>
+        </button>
+      </article>
+
+      <!-- Game 2: Keyboard Alphabet Bubble Shooter -->
+      <article class="arcade-card hoverable magenta-hover">
+        <div class="game-img-wrapper">
+          <img src="images/alpha-shoot.png" alt="Alphabet Bubble Shooter" class="game-img">
+        </div>
+        <div class="game-tag-row">
+          <span class="game-tag tag-magenta">Typing & Focus</span>
+          <span class="game-tag tag-cyan">Classes 5-10</span>
+        </div>
+        <h3 class="game-title">Alpha Shoot (Keyboard Shooter)</h3>
+        <p class="game-desc">
+          Pop letters with speed! Colored bubbles containing alphabets descend on canvas. Type the matching letters on your keyboard to shoot and pop them before shields run out.
+        </p>
+        <button class="btn-play btn-magenta-glow" onclick="launchGame('alpha-shoot')">
+          Launch Game <i class="fa-solid fa-circle-play"></i>
+        </button>
+      </article>
+
+      <!-- Game 3: Chess Trainer -->
+      <article class="arcade-card hoverable yellow-hover">
+        <div class="game-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=500" alt="Chess Trainer" class="game-img">
+        </div>
+        <div class="game-tag-row">
+          <span class="game-tag tag-yellow">Strategy & Chess</span>
+          <span class="game-tag tag-magenta">Classes 5-10</span>
+        </div>
+        <h3 class="game-title">Shatranj Sandbox (Chess Trainer)</h3>
+        <p class="game-desc">
+          Learn how chess pieces fly! Select a piece to see its valid legal moves highlighted on the board. Test strategies against CPU players or practice openings.
+        </p>
+        <button class="btn-play btn-yellow-glow" onclick="launchGame('chess-trainer')">
+          Launch Game <i class="fa-solid fa-circle-play"></i>
+        </button>
+      </article>
+
+    </section>
+
+  </main>
+
+  <!-- ==============================================
+       SANDBOX VIEW PANEL (unified loader shell)
+       ============================================== -->
+  <main id="sandbox-panel" class="arcade-panels">
+    
+    <!-- Back Header Actions -->
+    <div class="game-header-actions" style="margin-bottom: 1.5rem;">
+      <button class="back-btn" onclick="exitToPortal()">
+        <i class="fa-solid fa-circle-chevron-left"></i> Back to Games Arcade
+      </button>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="sandbox-layout">
+      
+      <!-- LEFT CONTAINER: ACTIVE GAME BOARD -->
+      <div class="arcade-card game-card-wrapper" id="gameCardWrapper">
+        
+        <!-- Minimizer exit floating button (only visible in fullscreen) -->
+        <button class="btn-play btn-glass fullscreen-btn-exit" style="width:auto; display:none;" id="fullscreenExitBtn" onclick="toggleFullscreen()">
+          <i class="fa-solid fa-compress"></i> Minimize Screen
+        </button>
+
+        <div id="board-container" class="board-container">
+          
+          <!-- [GAME 1 STRUCTURE: MATH TIC-TAC-TOE] -->
+          <div id="game-math-tictactoe-view" style="display:none; flex-direction:column; align-items:center; gap:1.5rem; width:100%;">
+            
+            <!-- Unified Game Header with Fullscreen controls -->
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:320px; border-bottom:1px solid var(--border-glow); padding-bottom:0.5rem; margin-bottom:0.5rem;">
+              <span style="font-family:var(--font-header); font-weight:700; font-size:1.1rem; color:#fff;">Ganit Combat</span>
+              <button class="btn-play btn-glass" style="width:auto; padding: 0.3rem 0.8rem; font-size: 0.75rem;" onclick="toggleFullscreen()">
+                <i class="fa-solid fa-expand"></i> Fullscreen
+              </button>
+            </div>
+            
+            <div style="text-align:center;">
+              <p class="game-desc" style="margin-bottom:0; font-size:0.85rem;">Solve arithmetic questions to claim tiles!</p>
+              <p style="font-size:0.8rem; color: var(--neon-cyan); margin-top:0.25rem;" id="mtttTurnStatus">Your turn: Select an empty square.</p>
+            </div>
+
+            <!-- TTT grid cells -->
+            <div class="mttt-board" id="mtttBoard">
+              <button class="mttt-cell" data-cell="0" onclick="clickTTTCell(0)"></button>
+              <button class="mttt-cell" data-cell="1" onclick="clickTTTCell(1)"></button>
+              <button class="mttt-cell" data-cell="2" onclick="clickTTTCell(2)"></button>
+              <button class="mttt-cell" data-cell="3" onclick="clickTTTCell(3)"></button>
+              <button class="mttt-cell" data-cell="4" onclick="clickTTTCell(4)"></button>
+              <button class="mttt-cell" data-cell="5" onclick="clickTTTCell(5)"></button>
+              <button class="mttt-cell" data-cell="6" onclick="clickTTTCell(6)"></button>
+              <button class="mttt-cell" data-cell="7" onclick="clickTTTCell(7)"></button>
+              <button class="mttt-cell" data-cell="8" onclick="clickTTTCell(8)"></button>
+            </div>
+
+            <!-- Quiz prompt container -->
+            <div class="cosmic-modal-overlay" id="mathQuizOverlay">
+              <div class="cosmic-modal math-quiz-card">
+                <h3 class="modal-title">Answer to Claim Cell</h3>
+                <div class="math-question" id="mathPrompt">7 × 8 = ?</div>
+                
+                <div class="math-input-wrapper">
+                  <input type="number" class="math-text-input" placeholder="Your Answer" id="mathAnswerInput">
+                  <span class="validation-msg" id="mathFeedbackMsg">Solve the sum correctly!</span>
+                </div>
+                
+                <div class="modal-actions" style="justify-content:center; gap:1rem;">
+                  <button class="btn-cosmic btn-glass" onclick="closeMathQuiz()">Cancel Cell</button>
+                  <button class="btn-cosmic btn-cyan" onclick="submitMathAnswer()">Submit Answer</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- [GAME 2 STRUCTURE: ALPHA SHOOT BUBBLES] -->
+          <div id="game-alpha-shoot-view" style="display:none; flex-direction:column; align-items:center; gap:1.25rem; width:100%;">
+            
+            <!-- Unified HUD including Pause and Fullscreen buttons directly with game display -->
+            <div class="bubble-hud" style="border-bottom:1px solid var(--border-glow); padding-bottom:0.5rem; margin-bottom:0.25rem; align-items:center;">
+              <div>Score: <strong id="bubbleScore">0</strong> XP</div>
+              
+              <!-- Quick Game Controls Bar -->
+              <div style="display: flex; gap: 0.5rem; align-items:center;">
+                <button class="btn-play btn-glass" id="pauseBubbleBtn" style="padding: 0.35rem 0.8rem; font-size: 0.75rem; width: auto; display:none;" onclick="togglePauseBubble()">
+                  <i class="fa-solid fa-pause" id="pauseBtnIcon"></i> <span id="pauseBtnText">Pause</span>
+                </button>
+                <button class="btn-play btn-glass" style="padding: 0.35rem 0.8rem; font-size: 0.75rem; width: auto;" onclick="toggleFullscreen()">
+                  <i class="fa-solid fa-expand"></i> Fullscreen
+                </button>
+              </div>
+
+              <div class="shield-hearts" id="bubbleShields">
+                <i class="fa-solid fa-heart"></i>
+                <i class="fa-solid fa-heart"></i>
+                <i class="fa-solid fa-heart"></i>
+                <i class="fa-solid fa-heart"></i>
+                <i class="fa-solid fa-heart"></i>
+              </div>
+            </div>
+            
+            <!-- Keyboard Canvas -->
+            <canvas id="bubbleCanvas" width="460" height="360"></canvas>
+            
+            <div class="bubble-controls" style="text-align:center;">
+              <button class="btn-play btn-magenta-glow" id="startBubbleBtn" style="width: auto; min-width: 160px;" onclick="startBubbleGame()">
+                Start Game <i class="fa-solid fa-play"></i>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- [GAME 3 STRUCTURE: CHESS SANDBOX] -->
+          <div id="game-chess-trainer-view" style="display:none; flex-direction:column; align-items:center; gap:1.5rem; width:100%;">
+            
+            <!-- Unified Game Header with Fullscreen controls -->
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:380px; border-bottom:1px solid var(--border-glow); padding-bottom:0.5rem; margin-bottom:0.5rem;">
+              <span style="font-family:var(--font-header); font-weight:700; font-size:1.1rem; color:#fff;">Shatranj Sandbox</span>
+              <button class="btn-play btn-glass" style="width:auto; padding: 0.3rem 0.8rem; font-size: 0.75rem;" onclick="toggleFullscreen()">
+                <i class="fa-solid fa-expand"></i> Fullscreen
+              </button>
+            </div>
+
+            <div style="text-align:center;">
+              <p style="font-size:0.8rem; color: var(--neon-cyan); margin-bottom:0.25rem;" id="chessTurnStatus">Press 'Start Match' to begin your training!</p>
+            </div>
+
+            <div class="chess-board-wrapper">
+              <div class="chess-board" id="chessBoard">
+                <!-- JavaScript will populate tiles here -->
+              </div>
+            </div>
+
+            <!-- Start Match State button -->
+            <div class="bubble-controls" style="text-align:center; width:100%; max-width:380px;" id="chessStartControls">
+              <button class="btn-play btn-yellow-glow" id="startChessBtn" onclick="startChessMatch()">
+                Start Match <i class="fa-solid fa-play"></i>
+              </button>
+            </div>
+
+            <!-- Active Match controls -->
+            <div class="code-runners" style="width:100%; max-width:380px; display:none;" id="chessActiveControls">
+              <button class="btn-play btn-glass" style="flex:1;" onclick="resetChessBoard()">
+                <i class="fa-solid fa-rotate"></i> Reset Match
+              </button>
+              <button class="btn-play btn-yellow-glow" style="flex:1;" onclick="makeAIMove()">
+                Let CPU Move <i class="fa-solid fa-robot"></i>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- RIGHT CONTAINER: GUIDE & RULES DRAWER -->
+      <div class="guide-container">
+        
+        <!-- Difficulty / Configuration Selector -->
+        <div class="arcade-card">
+          <h3 class="guide-title"><i class="fa-solid fa-gears"></i> Class Difficulty</h3>
+          
+          <div style="display:flex; flex-direction:column; gap: 0.75rem;">
+            <label class="game-desc" style="margin-bottom:0; font-size:0.85rem;" id="difficultyContext">Select difficulty to scale equation complexity or bubble speeds:</label>
+            <div style="display:flex; gap:0.5rem; width:100%;">
+              <button class="btn-play btn-glass active" id="diff-easy" style="padding: 0.5rem 0.5rem; font-size: 0.8rem; flex:1;" onclick="setDifficulty('easy')">Easy (Class 5-6)</button>
+              <button class="btn-play btn-glass" id="diff-med" style="padding: 0.5rem 0.5rem; font-size: 0.8rem; flex:1;" onclick="setDifficulty('med')">Medium (Class 7-8)</button>
+              <button class="btn-play btn-glass" id="diff-hard" style="padding: 0.5rem 0.5rem; font-size: 0.8rem; flex:1;" onclick="setDifficulty('hard')">Hard (Class 9-10)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- How to Play Well Panel -->
+        <div class="arcade-card">
+          <h3 class="guide-title" id="guideHeading"><i class="fa-solid fa-circle-question"></i> How to Play Well</h3>
+          
+          <div id="guideBodyText">
+            <!-- Dynamic instructions insert -->
+          </div>
+
+          <div class="badge-display">
+            <i class="fa-solid fa-shield-halved" style="color: var(--neon-cyan);" id="badgeIcon"></i>
+            <div class="badge-meta">
+              <h4 id="badgeTitle">Junior Novice</h4>
+              <p id="badgeDesc">Unlock high scores to rank up cadet badge levels!</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==============================================
+       MODAL & TOAST NOTIFICATION CHANNELS
+       ============================================== -->
+  <!-- ==============================================
+       VICTORY / CONGRATULATIONS SCREEN OVERLAY
+       ============================================== -->
+  <div class="cosmic-modal-overlay" id="victoryOverlay">
+    <div class="cosmic-modal victory-card" style="max-width: 520px; text-align: center; border-color: var(--neon-yellow); box-shadow: 0 0 50px rgba(250, 204, 21, 0.3);">
+      
+      <!-- Close modal button -->
+      <button class="modal-close" style="position: absolute; top: 1.25rem; right: 1.25rem;" onclick="closeVictoryScreen()"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="victory-icon-wrapper" style="margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-trophy" style="font-size: 4.5rem; color: var(--neon-yellow); filter: drop-shadow(0 0 15px rgba(250, 204, 21, 0.6));"></i>
+      </div>
+      
+      <h2 style="font-family: var(--font-header); font-weight: 800; font-size: 2.2rem; color: #fff; letter-spacing: 1px; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fff 30%, var(--neon-yellow) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        CONGRATULATIONS!
+      </h2>
+      <p style="color: var(--neon-cyan); font-family: var(--font-header); font-weight: 700; font-size: 1.1rem; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;" id="victorySub">
+        narenTech Victory Achieved
+      </p>
+      
+      <div class="victory-stats" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glow); border-radius: 12px; padding: 1.25rem; display: flex; justify-content: space-around; align-items: center; margin-bottom: 2rem;">
+        <div style="text-align: center;">
+          <div style="font-size: 0.75rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">XP Awarded</div>
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--neon-yellow); font-family: var(--font-header);" id="victoryXp">+0 XP</div>
+        </div>
+        <div style="width: 1px; height: 40px; background: var(--border-glow);"></div>
+        <div style="text-align: center;">
+          <div style="font-size: 0.75rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;">Current Score</div>
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--neon-cyan); font-family: var(--font-header);" id="victoryTotal">0 XP</div>
+        </div>
+      </div>
+      
+      <div style="color: var(--text-sub); font-size: 0.95rem; line-height: 1.6; margin-bottom: 2rem; padding: 0 0.5rem;" id="victoryMsg">
+        Amazing strategic thinking and skill! You have completed this logic challenge successfully. Keep it up!
+      </div>
+      
+      <div class="modal-actions" style="justify-content: center; gap: 1rem; flex-wrap: wrap;">
+        <button class="btn-play btn-glass" style="width: auto; padding: 0.7rem 1.5rem;" onclick="closeVictoryScreen()">
+          <i class="fa-solid fa-rotate-left"></i> Play Again
+        </button>
+        <button class="btn-play btn-yellow-glow" style="width: auto; padding: 0.7rem 1.5rem;" onclick="exitVictoryToPortal()">
+          Explore Other Games <i class="fa-solid fa-circle-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cosmic-modal-overlay" id="infoModalOverlay">
+    <div class="cosmic-modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Notice</h3>
+        <button class="modal-close" onclick="closeInfoModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="modalBodyText">
+        Information text here.
+      </div>
+      <div class="modal-actions">
+        <button class="btn-play btn-glass" style="width:auto; padding: 0.5rem 1.5rem;" onclick="closeInfoModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- APP ENGINE LOGIC -->
+  <script src="app.js"></script>
+</body>
+</html>
