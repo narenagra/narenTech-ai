@@ -1,0 +1,35 @@
+[
+  {
+    "id": "vid-1",
+    "title": "Deep Learning Foundations: Neural Networks Demystified",
+    "desc": "An intuitive, visual introduction to Artificial Neural Networks. Learn what weights, biases, and activation functions really do behind the scenes, and how mathematical nodes stack up to recognize complex features.",
+    "duration": "12:45",
+    "category": "Deep Learning",
+    "views": "14,284",
+    "date": "3 days ago",
+    "thumbnail": "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=500&auto=format&fit=crop&q=60",
+    "src": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+  },
+  {
+    "id": "vid-2",
+    "title": "Understanding the Backpropagation Algorithm Step-by-Step",
+    "desc": "Demystifying backpropagation using simple chain-rule calculus. We break down the mathematical computations required to propagate error gradients backwards and optimize weights using gradient descent.",
+    "duration": "18:20",
+    "category": "Optimization",
+    "views": "8,901",
+    "date": "1 week ago",
+    "thumbnail": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=500&auto=format&fit=crop&q=60",
+    "src": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+  },
+  {
+    "id": "vid-3",
+    "title": "Interactive Neural Sandbox Walkthrough & Tips",
+    "desc": "Watch this tutorial to learn how to configure our interactive neural sandbox. Learn why XOR requires hidden layers, how activation functions shape decision boundaries, and how to debug convergence issues.",
+    "duration": "08:15",
+    "category": "Simulations",
+    "views": "5,420",
+    "date": "2 weeks ago",
+    "thumbnail": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&auto=format&fit=crop&q=60",
+    "src": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+  }
+]
