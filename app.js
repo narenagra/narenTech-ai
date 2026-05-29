@@ -2088,6 +2088,51 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // 11. Admin Login Modal Bindings
+  const loginClose = document.getElementById('admin-login-close');
+  if (loginClose) loginClose.addEventListener('click', closeAdminLoginModal);
+  
+  const loginModal = document.getElementById('admin-login-modal');
+  if (loginModal) {
+    loginModal.addEventListener('click', (e) => {
+      if (e.target.id === 'admin-login-modal') closeAdminLoginModal();
+    });
+  }
+
+  const loginSubmit = document.getElementById('btn-admin-login-submit');
+  const loginInput = document.getElementById('admin-password-input');
+  
+  const submitAdminLogin = () => {
+    const pw = loginInput.value;
+    if (pw === 'Naren4035#') {
+      state.isAdmin = true;
+      sessionStorage.setItem('narentech_is_admin', 'true');
+      document.body.classList.add('admin-mode');
+      updateAdminPortalIcon();
+      renderVideos();
+      renderNotesList();
+      closeAdminLoginModal();
+      alert("Access Granted! Admin uploaders and delete tools have been unlocked.");
+    } else {
+      const err = document.getElementById('admin-login-error');
+      if (err) {
+        err.style.display = 'block';
+        setTimeout(() => {
+          err.style.display = 'none';
+        }, 3000);
+      }
+    }
+  };
+
+  if (loginSubmit) loginSubmit.addEventListener('click', submitAdminLogin);
+  if (loginInput) {
+    loginInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        submitAdminLogin();
+      }
+    });
+  }
 });
 
 // Admin Mode Activation Handler
@@ -2103,21 +2148,26 @@ function toggleAdminMode() {
       alert("Logged out of Admin Portal.");
     }
   } else {
-    const pw = prompt("Enter narenTech-ai Admin Password:");
-    if (pw === null) return; // Cancelled
-    
-    if (pw === 'Naren4035#') {
-      state.isAdmin = true;
-      sessionStorage.setItem('narentech_is_admin', 'true');
-      document.body.classList.add('admin-mode');
-      updateAdminPortalIcon();
-      renderVideos();
-      renderNotesList();
-      alert("Access Granted! Admin uploaders and delete tools have been unlocked.");
-    } else {
-      alert("Access Denied! Incorrect Admin password.");
-    }
+    openAdminLoginModal();
   }
+}
+
+function openAdminLoginModal() {
+  const modal = document.getElementById('admin-login-modal');
+  const input = document.getElementById('admin-password-input');
+  const err = document.getElementById('admin-login-error');
+  if (!modal) return;
+  
+  if (input) input.value = '';
+  if (err) err.style.display = 'none';
+  
+  modal.style.display = 'flex';
+  setTimeout(() => { if (input) input.focus(); }, 100);
+}
+
+function closeAdminLoginModal() {
+  const modal = document.getElementById('admin-login-modal');
+  if (modal) modal.style.display = 'none';
 }
 
 function updateAdminPortalIcon() {
