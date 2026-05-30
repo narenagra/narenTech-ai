@@ -1105,12 +1105,18 @@ function updatePongGame() {
 function drawPongGame() {
   if (!pongCtx || !pongCanvas) return;
 
-  // Fill canvas dark theme background
-  pongCtx.fillStyle = PONG_COLOR_BG;
+  const isLight = document.body.classList.contains('light-mode');
+  const colorBg = isLight ? "#f8fafc" : "#030712";
+  const colorGrid = isLight ? "rgba(15, 23, 42, 0.02)" : "rgba(255, 255, 255, 0.015)";
+  const colorBall = isLight ? "#be185d" : "#ec4899";
+  const colorPaddle = isLight ? "#0e7490" : "#06b6d4";
+
+  // Fill canvas theme background
+  pongCtx.fillStyle = colorBg;
   pongCtx.fillRect(0, 0, pongCanvas.width, pongCanvas.height);
 
   // Draw grid background overlay
-  pongCtx.strokeStyle = "rgba(255, 255, 255, 0.015)";
+  pongCtx.strokeStyle = colorGrid;
   pongCtx.lineWidth = 1;
   const cellSize = 30;
   for (let x = 0; x < pongCanvas.width; x += cellSize) {
@@ -1126,36 +1132,36 @@ function drawPongGame() {
     pongCtx.stroke();
   }
 
-  // Draw text pixels: gradient color for unhit, dark slate for hit
+  // Draw text pixels: gradient color for unhit, light gray/dark slate for hit
   pongPixels.forEach((pixel) => {
     if (pixel.hit) {
-      pongCtx.fillStyle = "#1e293b"; // dark slate (hit state)
+      pongCtx.fillStyle = isLight ? "#cbd5e1" : "#1e293b";
     } else {
       const yRel = pixel.y / pongCanvas.height;
       if (yRel < 0.45) {
-        pongCtx.fillStyle = COLORS.accentPurple; // neon violet
+        pongCtx.fillStyle = isLight ? "#6d28d9" : COLORS.accentPurple;
       } else if (yRel < 0.65) {
-        pongCtx.fillStyle = COLORS.accentPink; // neon pink
+        pongCtx.fillStyle = isLight ? "#be185d" : COLORS.accentPink;
       } else {
-        pongCtx.fillStyle = COLORS.accentCyan; // neon cyan
+        pongCtx.fillStyle = isLight ? "#0e7490" : COLORS.accentCyan;
       }
     }
     pongCtx.fillRect(pixel.x, pixel.y, pixel.size, pixel.size);
   });
 
-  // Draw ball (neon pink with glow)
-  pongCtx.shadowColor = COLORS.accentPink;
-  pongCtx.shadowBlur = 10;
-  pongCtx.fillStyle = PONG_COLOR_BALL;
+  // Draw ball (vibrant accent with shadow glow)
+  pongCtx.shadowColor = colorBall;
+  pongCtx.shadowBlur = isLight ? 4 : 10;
+  pongCtx.fillStyle = colorBall;
   pongCtx.beginPath();
   pongCtx.arc(pongBall.x, pongBall.y, pongBall.radius, 0, Math.PI * 2);
   pongCtx.fill();
   pongCtx.shadowBlur = 0; // reset shadow
 
-  // Draw paddles (neon cyan with glow)
-  pongCtx.shadowColor = PONG_COLOR_PADDLE;
-  pongCtx.shadowBlur = 8;
-  pongCtx.fillStyle = PONG_COLOR_PADDLE;
+  // Draw paddles (vibrant accent with shadow glow)
+  pongCtx.shadowColor = colorPaddle;
+  pongCtx.shadowBlur = isLight ? 4 : 8;
+  pongCtx.fillStyle = colorPaddle;
   pongPaddles.forEach((paddle) => {
     pongCtx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
   });
@@ -1531,6 +1537,16 @@ async function triggerGitHubSync() {
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize Local storage
   initializeStorage();
+  
+  // Initialize Theme preference
+  const savedTheme = localStorage.getItem('narentech_theme') || 'dark';
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-mode');
+    updateThemeToggleIcon(true);
+  } else {
+    document.body.classList.remove('light-mode');
+    updateThemeToggleIcon(false);
+  }
   
   // Set dynamic contact links & texts to hide raw numbers from source code
   document.querySelectorAll('.wa-dynamic-link').forEach(el => {
@@ -1998,6 +2014,21 @@ document.addEventListener('DOMContentLoaded', () => {
     updateAdminPortalIcon();
   }
 
+  // Theme Toggle bind
+  const themeBtn = document.getElementById('btn-theme-toggle');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      const isLight = document.body.classList.toggle('light-mode');
+      localStorage.setItem('narentech_theme', isLight ? 'light' : 'dark');
+      updateThemeToggleIcon(isLight);
+      
+      // If Pong simulator is running, redraw it instantly with new theme colors
+      if (state.pong.isRunning) {
+        drawPongGame();
+      }
+    });
+  }
+
   // 10. GitHub Settings Modal Event Bindings
   const btnVideoGh = document.getElementById('btn-video-gh-config');
   const btnNotesGh = document.getElementById('btn-notes-gh-config');
@@ -2323,4 +2354,22 @@ function getAutonomousResponse(query) {
     `💡 For direct help or inquiries, feel free to contact Naren on [WhatsApp](${getWaLink()}) or [Telegram](${getTgLink()}).`
   ];
   return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+}
+
+function updateThemeToggleIcon(isLight) {
+  const btn = document.getElementById('btn-theme-toggle');
+  if (!btn) return;
+  if (isLight) {
+    // Moon Icon SVG
+    btn.innerHTML = `
+      <svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    `;
+    btn.title = "Switch to Dark Mode";
+  } else {
+    // Sun Icon SVG
+    btn.innerHTML = `
+      <svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.22" x2="5.64" y2="17.78"></line><line x1="18.36" y1="5.64" x2="19.78" y2="7.07"></line></svg>
+    `;
+    btn.title = "Switch to Light Mode";
+  }
 }

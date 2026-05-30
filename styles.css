@@ -40,6 +40,124 @@
   --shadow-glow: 0 0 20px 0 var(--accent-purple-glow);
 }
 
+/* Light Theme Variable Overrides */
+body.light-mode {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.70);
+  --bg-card-hover: rgba(255, 255, 255, 0.95);
+  --bg-glass: rgba(248, 250, 252, 0.85);
+
+  --accent-purple: #6d28d9;
+  --accent-purple-glow: rgba(109, 40, 217, 0.12);
+  --accent-cyan: #0e7490;
+  --accent-cyan-glow: rgba(14, 116, 144, 0.12);
+  --accent-pink: #be185d;
+  --accent-pink-glow: rgba(190, 24, 93, 0.12);
+
+  --border-color: rgba(15, 23, 42, 0.08);
+  --border-color-hover: rgba(15, 23, 42, 0.16);
+  --border-glow: rgba(109, 40, 217, 0.08);
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  --status-success: #047857;
+  --status-warning: #b45309;
+  --status-error: #b91c1c;
+  --status-info: #1d4ed8;
+}
+
+/* Light Theme Element Adjustments */
+body.light-mode .bg-grid {
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.02) 1px, transparent 1px);
+}
+
+body.light-mode .bg-radial-glow {
+  background: 
+    radial-gradient(circle 800px at 80% 20%, rgba(109, 40, 217, 0.035), transparent 80%),
+    radial-gradient(circle 600px at 15% 80%, rgba(14, 116, 144, 0.03), transparent 80%);
+}
+
+body.light-mode ::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.12);
+  border: 2px solid #f8fafc;
+}
+
+body.light-mode ::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+body.light-mode .bot-msg {
+  background: rgba(15, 23, 42, 0.03);
+  color: #1e293b;
+}
+
+body.light-mode .chat-bubble strong {
+  color: #0f172a;
+}
+
+body.light-mode .chat-quick-replies {
+  background: rgba(15, 23, 42, 0.02);
+}
+
+body.light-mode .notes-content-area {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+body.light-mode .notes-item {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+body.light-mode .notes-item:hover, body.light-mode .notes-item.active {
+  background: rgba(109, 40, 217, 0.06);
+}
+
+body.light-mode .reader-body {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+body.light-mode .reader-body p {
+  color: #334155;
+}
+
+body.light-mode .reader-body pre {
+  background: #f1f5f9;
+}
+
+body.light-mode .reader-body code {
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+}
+
+body.light-mode .reader-body pre code {
+  color: #0369a1;
+  background: transparent;
+}
+
+body.light-mode .form-control {
+  background: rgba(15, 23, 42, 0.02);
+}
+
+body.light-mode .form-control:focus {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+body.light-mode .social-connect-card {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+body.light-mode .chatbot-floating-trigger {
+  box-shadow: 0 4px 20px rgba(109, 40, 217, 0.25), 0 0 15px rgba(109, 40, 217, 0.15);
+}
+
+body.light-mode #main-player {
+  background: #000;
+}
+
 /* Global Reset */
 * {
   box-sizing: border-box;
@@ -1792,6 +1910,182 @@ body:has(#dashboard-tab.active) .footer-bottom {
   border: 1px solid rgba(6, 182, 212, 0.2);
   color: var(--accent-cyan);
   display: block !important;
+}
+
+/* ==========================================================================
+   PONG SIMULATOR DASHBOARD RESPONSIVE GRIDS
+   ========================================================================== */
+.pong-controls-dashboard {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.pong-parameters-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVENESS OVERRIDES
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Header stack & adjustments */
+  header {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    padding: 1rem !important;
+    align-items: center !important;
+  }
+
+  .nav-links {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    border-radius: 12px !important;
+    padding: 0.2rem !important;
+  }
+
+  .nav-item {
+    justify-content: center !important;
+    padding: 0.5rem 0.25rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 8px !important;
+    gap: 0.25rem !important;
+  }
+
+  .nav-item svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  
+  .nav-item span {
+    display: none !important; /* Hide label text on mobile to prevent overflow, icons are clear */
+  }
+
+  header div[style*="display: flex"] {
+    width: 100% !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .youtube-badge {
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.8rem !important;
+    gap: 0.35rem !important;
+  }
+
+  /* Hero adjustments */
+  .hero {
+    grid-template-columns: 1fr !important;
+    gap: 1.75rem !important;
+    margin-bottom: 2.5rem !important;
+  }
+
+  .hero-title {
+    font-size: 2.2rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .hero-desc {
+    font-size: 0.95rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .hero-buttons {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.75rem !important;
+  }
+
+  .hero-buttons .btn {
+    width: 100% !important;
+  }
+  
+  /* Sections headers spacing */
+  .section-header {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    align-items: start !important;
+    text-align: left !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* Video and note cards */
+  .upload-wrapper {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .notes-container {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .notes-content-area {
+    min-height: 400px !important;
+  }
+
+  .reader-body {
+    padding: 1.25rem 1rem !important;
+    font-size: 0.95rem !important;
+  }
+
+  .reader-settings {
+    gap: 0.5rem !important;
+  }
+
+  /* AI Simulator page layout */
+  .pong-controls-dashboard {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+
+  .pong-parameters-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Chatbot bubble adjustments */
+  .chatbot-floating-trigger {
+    bottom: 1rem !important;
+    right: 1rem !important;
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .chatbot-container {
+    width: calc(100vw - 2rem) !important;
+    height: 70vh !important;
+    bottom: 5rem !important;
+    right: 1rem !important;
+  }
+  
+  .chat-quick-replies {
+    padding: 0.5rem 1rem !important;
+    gap: 0.4rem !important;
+  }
+  
+  .quick-reply-btn {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* Compact footer social cards on mobile */
+  body:has(#kids-arcade-tab.active) .social-connect-card .social-name,
+  body:has(#dashboard-tab.active) .social-connect-card .social-name {
+    display: none !important;
+  }
+  
+  body:has(#kids-arcade-tab.active) .social-cards,
+  body:has(#dashboard-tab.active) .social-cards {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
 }
 
 
