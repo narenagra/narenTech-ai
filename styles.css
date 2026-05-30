@@ -70,6 +70,53 @@ body.light-mode {
 }
 
 /* Light Theme Element Adjustments */
+body.light-mode header {
+  background: rgba(248, 250, 252, 0.85);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+body.light-mode .nav-links {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+body.light-mode .nav-item {
+  color: var(--text-secondary);
+}
+
+body.light-mode .nav-item:hover {
+  color: var(--text-primary);
+  background: rgba(15, 23, 42, 0.05);
+}
+
+body.light-mode .nav-item.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+}
+
+body.light-mode #btn-admin-portal,
+body.light-mode #btn-theme-toggle {
+  background: rgba(15, 23, 42, 0.04) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  color: var(--text-secondary) !important;
+}
+
+body.light-mode #btn-admin-portal:hover,
+body.light-mode #btn-theme-toggle:hover {
+  background: rgba(15, 23, 42, 0.08) !important;
+  color: var(--text-primary) !important;
+}
+
+body.light-mode footer {
+  background: rgba(241, 245, 249, 0.9);
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+body.light-mode .footer-bottom {
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  color: var(--text-muted);
+}
+
 body.light-mode .bg-grid {
   background-image: 
     linear-gradient(to right, rgba(15, 23, 42, 0.02) 1px, transparent 1px),

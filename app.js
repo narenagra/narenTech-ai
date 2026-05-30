@@ -2018,7 +2018,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeBtn = document.getElementById('btn-theme-toggle');
   if (themeBtn) {
     themeBtn.addEventListener('click', () => {
-      const isLight = document.body.classList.toggle('light-mode');
+      document.body.classList.toggle('light-mode');
+      const isLight = document.body.classList.contains('light-mode');
       localStorage.setItem('narentech_theme', isLight ? 'light' : 'dark');
       updateThemeToggleIcon(isLight);
       
