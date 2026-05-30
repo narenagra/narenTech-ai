@@ -1835,45 +1835,38 @@ body.admin-mode #video-hub-wrapper {
 /* ==========================================================================
    KIDS ARCADE COMPACT FOOTER STYLING
    ========================================================================== */
-/* When the Kids Arcade or Dashboard tab is active, we shrink the footer to prevent page scrollbar */
-body:has(#kids-arcade-tab.active) footer,
-body:has(#dashboard-tab.active) footer {
+/* Compact Footer Styling across all tabs to decrease height and prevent scrollbars */
+footer {
   margin-top: 1rem !important;
   padding: 1rem 2rem 1rem 2rem !important;
 }
 
-body:has(#kids-arcade-tab.active) .footer-content,
-body:has(#dashboard-tab.active) .footer-content {
+.footer-content {
   margin-bottom: 0.75rem !important;
   gap: 1.5rem !important;
   grid-template-columns: 1fr 2.5fr !important;
 }
 
-body:has(#kids-arcade-tab.active) .footer-brand p,
-body:has(#dashboard-tab.active) .footer-brand p {
+.footer-brand p {
   display: none !important; /* Hide description text */
 }
 
-body:has(#kids-arcade-tab.active) .footer-brand h3,
-body:has(#dashboard-tab.active) .footer-brand h3 {
+.footer-brand h3 {
   margin-bottom: 0.25rem !important;
 }
 
-body:has(#kids-arcade-tab.active) .footer-brand,
-body:has(#dashboard-tab.active) .footer-brand {
+.footer-brand {
   display: flex !important;
   flex-direction: column !important;
   justify-content: center !important;
 }
 
-body:has(#kids-arcade-tab.active) .social-cards,
-body:has(#dashboard-tab.active) .social-cards {
+.social-cards {
   grid-template-columns: repeat(4, 1fr) !important;
   gap: 0.5rem !important;
 }
 
-body:has(#kids-arcade-tab.active) .social-connect-card,
-body:has(#dashboard-tab.active) .social-connect-card {
+.social-connect-card {
   flex-direction: row !important;
   align-items: center !important;
   justify-content: center !important;
@@ -1883,31 +1876,25 @@ body:has(#dashboard-tab.active) .social-connect-card {
   height: auto !important;
 }
 
-body:has(#kids-arcade-tab.active) .social-connect-card .social-arrow,
-body:has(#kids-arcade-tab.active) .social-connect-card .social-handle,
-body:has(#dashboard-tab.active) .social-connect-card .social-arrow,
-body:has(#dashboard-tab.active) .social-connect-card .social-handle {
+.social-connect-card .social-arrow,
+.social-connect-card .social-handle {
   display: none !important; /* Hide arrow and subtext */
 }
 
-body:has(#kids-arcade-tab.active) .social-connect-card .social-icon,
-body:has(#dashboard-tab.active) .social-connect-card .social-icon {
+.social-connect-card .social-icon {
   font-size: 1rem !important;
 }
 
-body:has(#kids-arcade-tab.active) .social-connect-card .social-icon svg,
-body:has(#dashboard-tab.active) .social-connect-card .social-icon svg {
+.social-connect-card .social-icon svg {
   width: 14px !important;
   height: 14px !important;
 }
 
-body:has(#kids-arcade-tab.active) .social-connect-card .social-name,
-body:has(#dashboard-tab.active) .social-connect-card .social-name {
+.social-connect-card .social-name {
   font-size: 0.75rem !important;
 }
 
-body:has(#kids-arcade-tab.active) .footer-bottom,
-body:has(#dashboard-tab.active) .footer-bottom {
+.footer-bottom {
   padding-top: 0.75rem !important;
 }
 
@@ -2124,13 +2111,11 @@ body:has(#dashboard-tab.active) .footer-bottom {
   }
 
   /* Compact footer social cards on mobile */
-  body:has(#kids-arcade-tab.active) .social-connect-card .social-name,
-  body:has(#dashboard-tab.active) .social-connect-card .social-name {
+  .social-connect-card .social-name {
     display: none !important;
   }
   
-  body:has(#kids-arcade-tab.active) .social-cards,
-  body:has(#dashboard-tab.active) .social-cards {
+  .social-cards {
     grid-template-columns: repeat(4, 1fr) !important;
   }
 }

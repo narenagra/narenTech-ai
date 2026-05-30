@@ -9,9 +9,8 @@
 </head>
 <body>
 
-  <!-- Dynamic Interactive Background -->
-  <div class="bg-grid"></div>
-  <div class="bg-radial-glow"></div>
+  <!-- ASMR Static Interactive Background Canvas -->
+  <canvas id="asmrBackgroundCanvas" style="position: fixed; inset: 0; z-index: -2; width: 100vw; height: 100vh; display: block; pointer-events: none;"></canvas>
 
   <!-- Navigation Header -->
   <header>
@@ -66,40 +65,68 @@
         <div class="hero-text-content">
           <span class="hero-subtitle">Next-Gen Education by narenTech-ai</span>
           <h1 class="hero-title">
-            <span>Demystifying</span>
-            <span class="gradient-text">Artificial Intelligence</span>
+            <span>Master AI, Programming &amp;</span>
+            <span class="gradient-text">Tech Problem Solving</span>
           </h1>
+          <p class="hero-desc" style="margin-bottom: 1rem;">
+            Learn Artificial Intelligence, Java Development, Cloud Technologies, and Computer Troubleshooting through hands-on tutorials, real-world projects, study materials, and practical solutions.
+          </p>
           <p class="hero-desc">
-            Welcome to narenTech-ai, your comprehensive learning hub for Deep Learning, Machine Learning, and Computer Vision. Dive into step-by-step video courses, read production-grade documentation, and train actual neural networks interactively right inside your browser.
+            Build skills that matter with step-by-step guides, interview preparation resources, AI tools, coding exercises, and industry-focused learning paths.
           </p>
           <div class="hero-buttons">
             <button class="btn btn-primary" onclick="switchTab('sandbox-tab')">
-              Launch AI Simulator
+              Start Learning
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </button>
             <button class="btn btn-secondary" onclick="switchTab('videos-tab')">
-              Browse Videos
+              Explore Tutorials
             </button>
           </div>
         </div>
-        <div class="hero-visual">
+        <div class="hero-visual" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;">
           <div class="hero-glow-sphere"></div>
-          <!-- Premium 3D Glass Card showing Simulated Channel Logo -->
-          <div class="glass-card purple-glow" style="width: 320px; padding: 2rem; text-align: center; border-radius: 24px;">
-            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); border-radius: 20px; margin: 0 auto 1.5rem auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px var(--accent-purple-glow);">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+          
+          <!-- Sparkles Card (TSParticles style) -->
+          <div class="glass-card purple-glow" id="sparkles-card" style="width: 420px; height: 420px; max-width: 100%; aspect-ratio: 1/1; padding: 0.5rem; position: relative; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; cursor: pointer;">
+            <!-- Core Canvas -->
+            <canvas id="sparklesCanvas" style="width: 100%; height: 100%; position: absolute; inset: 0; z-index: 1; pointer-events: none;"></canvas>
+            
+            <!-- Gradient lines (from React component design) -->
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 10px; z-index: 2; pointer-events: none; width: 100%;">
+              <div style="position: absolute; left: 12.5%; right: 12.5%; top: 0; background: linear-gradient(to right, transparent, var(--accent-purple), transparent); height: 2px; width: 75%; filter: blur(4px);"></div>
+              <div style="position: absolute; left: 12.5%; right: 12.5%; top: 0; background: linear-gradient(to right, transparent, var(--accent-purple), transparent); height: 1px; width: 75%;"></div>
+              <div style="position: absolute; left: 37.5%; right: 37.5%; top: 0; background: linear-gradient(to right, transparent, var(--accent-cyan), transparent); height: 5px; width: 25%; filter: blur(4px);"></div>
+              <div style="position: absolute; left: 37.5%; right: 37.5%; top: 0; background: linear-gradient(to right, transparent, var(--accent-cyan), transparent); height: 1px; width: 25%;"></div>
             </div>
-            <h3 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">narenTech-ai</h3>
-            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">YT Educational Hub</p>
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem; display: flex; justify-content: space-around;">
+
+            <!-- Central Brand text -->
+            <h1 style="font-size: 2.2rem; font-weight: 800; color: #fff; position: relative; z-index: 3; text-shadow: 0 4px 20px rgba(0,0,0,0.6); user-select: none;">
+              narenTech<span style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></span><span style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; border: 1px solid var(--accent-cyan); padding: 0.1rem 0.35rem; border-radius: 6px; font-size: 1.5rem; margin-left: 0.2rem; box-shadow: 0 0 15px rgba(6,182,212,0.4);">AI</span>
+            </h1>
+
+            <!-- Radial Mask Overlay to prevent sharp edges -->
+            <div style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; background: radial-gradient(circle at center, transparent 35%, #000000 85%); opacity: 0.7;"></div>
+            
+            <!-- Floating interaction hint -->
+            <div id="sparkles-hint" style="position: absolute; bottom: 1rem; right: 1rem; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border: 1px solid var(--border-color); padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.7rem; color: #fff; z-index: 10; pointer-events: none; opacity: 0.8; transition: opacity 0.5s;">
+              Click to add sparkles
+            </div>
+          </div>
+
+          <!-- Channel Stats Row -->
+          <div class="glass-card" style="width: 420px; max-width: 100%; padding: 1rem; text-align: center; border-radius: 16px;">
+            <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.25rem;">narenTech-ai</h3>
+            <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 0.75rem;">YT Educational Hub</p>
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.5rem; display: flex; justify-content: space-around;">
               <div>
-                <p style="font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan);">125k+</p>
-                <p style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Students</p>
+                <p style="font-size: 1rem; font-weight: 700; color: var(--accent-cyan);">125k+</p>
+                <p style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Students</p>
               </div>
-              <div style="border-left: 1px solid var(--border-color); height: 35px;"></div>
+              <div style="border-left: 1px solid var(--border-color); height: 25px;"></div>
               <div>
-                <p style="font-size: 1.1rem; font-weight: 700; color: var(--accent-purple);">450+</p>
-                <p style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Videos</p>
+                <p style="font-size: 1rem; font-weight: 700; color: var(--accent-purple);">450+</p>
+                <p style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Videos</p>
               </div>
             </div>
           </div>

@@ -1574,6 +1574,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial renders
   renderVideos();
   renderNotesList();
+  initHeroSparkles();
+  initASMRBackground();
   
   // Select first note by default
   if (state.notes.length > 0) {
@@ -2373,4 +2375,319 @@ function updateThemeToggleIcon(isLight) {
     `;
     btn.title = "Switch to Light Mode";
   }
+}
+
+// ----------------------------------------------------
+// DYNAMIC HERO SPARKLES ENGINE (VANILLA TS-PARTICLES EQUIVALENT)
+// ----------------------------------------------------
+function initHeroSparkles() {
+  const canvas = document.getElementById('sparklesCanvas');
+  const card = document.getElementById('sparkles-card');
+  if (!canvas || !card) return;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  let width = canvas.width = card.clientWidth;
+  let height = canvas.height = card.clientHeight;
+
+  const particles = [];
+  const particleCount = 65;
+
+  class Particle {
+    constructor(x, y, isSpawned = false) {
+      this.x = x !== undefined ? x : Math.random() * width;
+      this.y = y !== undefined ? y : Math.random() * height;
+      this.size = Math.random() * 1.5 + 0.6;
+      this.baseOpacity = Math.random() * 0.7 + 0.3;
+      this.opacity = this.baseOpacity;
+      
+      // Speed (slow drift, matching sparkles speed)
+      this.speedX = (Math.random() - 0.5) * 0.35;
+      this.speedY = (Math.random() - 0.5) * 0.35;
+      
+      if (isSpawned) {
+        // Burst velocity
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 1.8 + 0.5;
+        this.speedX = Math.cos(angle) * velocity;
+        this.speedY = Math.sin(angle) * velocity;
+        this.size = Math.random() * 2.2 + 0.8;
+      }
+      
+      this.twinkleFactor = Math.random() * 0.05 + 0.01;
+      this.twinkleDirection = Math.random() > 0.5 ? 1 : -1;
+    }
+
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+
+      // Friction for burst particles
+      this.speedX *= 0.98;
+      this.speedY *= 0.98;
+
+      // Slowly return speeds to baseline drift
+      const targetSpeed = 0.35;
+      if (Math.abs(this.speedX) > targetSpeed) this.speedX *= 0.95;
+      if (Math.abs(this.speedY) > targetSpeed) this.speedY *= 0.95;
+
+      // Bounce/Wrap boundaries
+      if (this.x < 0) this.x = width;
+      if (this.x > width) this.x = 0;
+      if (this.y < 0) this.y = height;
+      if (this.y > height) this.y = 0;
+
+      // Twinkle animation
+      this.opacity += this.twinkleDirection * this.twinkleFactor;
+      if (this.opacity >= 1) {
+        this.opacity = 1;
+        this.twinkleDirection = -1;
+      } else if (this.opacity <= 0.1) {
+        this.opacity = 0.1;
+        this.twinkleDirection = 1;
+      }
+    }
+
+    draw() {
+      ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // Initialize baseline sparkles
+  for (let i = 0; i < particleCount; i++) {
+    particles.push(new Particle());
+  }
+
+  // Animation Loop
+  let animationId;
+  const render = () => {
+    animationId = requestAnimationFrame(render);
+    ctx.clearRect(0, 0, width, height);
+
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+  };
+  render();
+
+  // Mouse Click Event - Spawn sparkles (Push mode)
+  card.addEventListener('click', (e) => {
+    const rect = card.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+
+    // Spawn 8 burst sparkles
+    for (let i = 0; i < 8; i++) {
+      particles.push(new Particle(clickX, clickY, true));
+    }
+
+    // Keep particles count from growing infinitely (cap at 150)
+    if (particles.length > 150) {
+      particles.splice(0, particles.length - 150);
+    }
+
+    // Remove interaction hint on first click
+    const hint = document.getElementById('sparkles-hint');
+    if (hint) {
+      hint.style.opacity = '0';
+      setTimeout(() => hint.remove(), 500);
+    }
+  });
+
+  // Handle container resize
+  const handleResize = () => {
+    width = canvas.width = card.clientWidth;
+    height = canvas.height = card.clientHeight;
+  };
+  window.addEventListener('resize', handleResize);
+}
+
+// ----------------------------------------------------
+// ASMR ATMOSPHERIC INTERACTIVE BACKGROUND CANVAS ENGINE
+// ----------------------------------------------------
+function initASMRBackground() {
+  const canvas = document.getElementById('asmrBackgroundCanvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+  let animationFrameId;
+  let particles = [];
+  const mouse = { x: -1000, y: -1000 };
+
+  const PARTICLE_COUNT = 800;
+  const MAGNETIC_RADIUS = 280;
+  const VORTEX_STRENGTH = 0.07;
+  const PULL_STRENGTH = 0.12;
+
+  class Particle {
+    constructor() {
+      this.reset();
+    }
+
+    reset() {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.size = Math.random() * 1.5 + 0.5;
+      this.vx = (Math.random() - 0.5) * 0.2;
+      this.vy = (Math.random() - 0.5) * 0.2;
+      
+      const isLightMode = document.body.classList.contains('light-mode');
+      const isGlass = Math.random() > 0.7;
+      
+      if (isLightMode) {
+        // Light mode: Slate-300 (light) and Slate-900 (dark) shards
+        this.color = isGlass ? '15, 23, 42' : '203, 213, 225';
+      } else {
+        // Dark mode: Glass (white/light blue) and Charcoal (dark grey) shards
+        this.color = isGlass ? '240, 245, 255' : '80, 80, 85';
+      }
+      
+      this.alpha = Math.random() * 0.35 + 0.08;
+      this.rotation = Math.random() * Math.PI * 2;
+      this.rotationSpeed = (Math.random() - 0.5) * 0.05;
+      this.frictionGlow = 0;
+    }
+
+    update() {
+      const dx = mouse.x - this.x;
+      const dy = mouse.y - this.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < MAGNETIC_RADIUS) {
+        const force = (MAGNETIC_RADIUS - dist) / MAGNETIC_RADIUS;
+        
+        // Magnetic center pull
+        this.vx += (dx / dist) * force * PULL_STRENGTH;
+        this.vy += (dy / dist) * force * PULL_STRENGTH;
+
+        // Swirl vortex motion
+        this.vx += (dy / dist) * force * VORTEX_STRENGTH * 10;
+        this.vy -= (dx / dist) * force * VORTEX_STRENGTH * 10;
+
+        this.frictionGlow = force * 0.7;
+      } else {
+        this.frictionGlow *= 0.92;
+      }
+
+      this.x += this.vx;
+      this.y += this.vy;
+
+      this.vx *= 0.95;
+      this.vy *= 0.95;
+
+      this.vx += (Math.random() - 0.5) * 0.04;
+      this.vy += (Math.random() - 0.5) * 0.04;
+
+      this.rotation += this.rotationSpeed + (Math.abs(this.vx) + Math.abs(this.vy)) * 0.05;
+
+      if (this.x < -20) this.x = width + 20;
+      if (this.x > width + 20) this.x = -20;
+      if (this.y < -20) this.y = height + 20;
+      if (this.y > height + 20) this.y = -20;
+    }
+
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rotation);
+      
+      const finalAlpha = Math.min(this.alpha + this.frictionGlow, 0.9);
+      ctx.fillStyle = `rgba(${this.color}, ${finalAlpha})`;
+      
+      const isLightMode = document.body.classList.contains('light-mode');
+      if (this.frictionGlow > 0.3) {
+        ctx.shadowBlur = 8 * this.frictionGlow;
+        ctx.shadowColor = isLightMode 
+          ? `rgba(79, 70, 229, ${this.frictionGlow})` // Purple glow in light mode
+          : `rgba(180, 220, 255, ${this.frictionGlow})`; // Ice blue glow in dark mode
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(0, -this.size * 2.5);
+      ctx.lineTo(this.size, 0);
+      ctx.lineTo(0, this.size * 2.5);
+      ctx.lineTo(-this.size, 0);
+      ctx.closePath();
+      ctx.fill();
+      
+      ctx.restore();
+    }
+  }
+
+  const init = () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+    particles = [];
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push(new Particle());
+    }
+  };
+
+  const render = () => {
+    const isLightMode = document.body.classList.contains('light-mode');
+    
+    // Smooth trail clear color matching backgrounds
+    ctx.fillStyle = isLightMode 
+      ? 'rgba(248, 250, 252, 0.18)' 
+      : 'rgba(3, 7, 18, 0.18)';
+      
+    ctx.fillRect(0, 0, width, height);
+
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+
+    animationFrameId = requestAnimationFrame(render);
+  };
+
+  const handleMouseMove = (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches[0]) {
+      mouse.x = e.touches[0].clientX;
+      mouse.y = e.touches[0].clientY;
+    }
+  };
+
+  // Re-initialize colors on theme toggle
+  const handleThemeChange = () => {
+    particles.forEach(p => {
+      const isLightMode = document.body.classList.contains('light-mode');
+      const isGlass = Math.random() > 0.7;
+      if (isLightMode) {
+        p.color = isGlass ? '15, 23, 42' : '203, 213, 225';
+      } else {
+        p.color = isGlass ? '240, 245, 255' : '80, 80, 85';
+      }
+    });
+  };
+
+  window.addEventListener('resize', init);
+  window.addEventListener('mousemove', handleMouseMove);
+  window.addEventListener('touchmove', handleTouchMove);
+  
+  // Listen for clicks on theme button to immediately swap particle palettes
+  const themeBtn = document.getElementById('btn-theme-toggle');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      // Delay slightly to let classList toggle first
+      setTimeout(handleThemeChange, 20);
+    });
+  }
+
+  init();
+  render();
 }
